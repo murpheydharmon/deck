@@ -54,37 +54,37 @@ Migrating 570 JavaScript files to TypeScript across the Spinnaker Deck monorepo 
 - [ ] packages/core/src/widgets/spelText/spelAutocomplete.service.js
 - [ ] packages/core/src/widgets/scopeClusterSelector.directive.js
 
-## Phase 3: Cloud Provider Package Migration
-### Oracle Package (~32 files) 📋
-- [ ] packages/oracle/src/serverGroup/configure/serverGroup.configure.module.js
-- [ ] packages/oracle/src/serverGroup/configure/serverGroupCommandBuilder.service.js
-- [ ] packages/oracle/src/serverGroup/configure/serverGroupConfiguration.service.js
-- [ ] packages/oracle/src/serverGroup/details/serverGroupDetails.controller.js
-- [ ] packages/oracle/src/serverGroup/details/rollback/rollbackServerGroup.controller.js
-- [ ] packages/oracle/src/pipeline/stages/bake/ociBakeStage.js
-- [ ] packages/oracle/src/securityGroup/configure/createSecurityGroup.controller.js
-- [ ] packages/oracle/src/pipeline/stages/bake/bakeExecutionDetails.controller.js
-- [ ] packages/oracle/src/pipeline/stages/findAmi/findAmiStage.js
-- [ ] packages/oracle/src/pipeline/stages/shrinkCluster/shrinkClusterStage.js
-- [ ] packages/oracle/src/pipeline/stages/scaleDownCluster/scaleDownClusterStage.js
-- [ ] packages/oracle/src/serverGroup/configure/wizard/cloneServerGroup.controller.js
-- [ ] packages/oracle/src/pipeline/stages/resizeAsg/resizeAsgStage.js
-- [ ] packages/oracle/src/pipeline/stages/disableAsg/disableAsgStage.js
-- [ ] packages/oracle/src/securityGroup/securityGroup.reader.js
-- [ ] packages/oracle/src/securityGroup/securityGroup.transformer.js
-- [ ] packages/oracle/src/common/footer.component.js
-- [ ] packages/oracle/src/serverGroup/serverGroup.transformer.js
-- [ ] packages/oracle/src/serverGroup/details/resize/resizeServerGroup.controller.js
-- [ ] packages/oracle/src/pipeline/stages/findImageFromTags/oracleFindImageFromTagsStage.js
-- [ ] packages/oracle/src/serverGroup/details/resize/resizeCapacity.component.js
-- [ ] packages/oracle/src/pipeline/disableAsg/disableAsgStage.js
-- [ ] packages/oracle/src/common/ocid/truncateOcid.filter.js
-- [ ] packages/oracle/src/pipeline/stages/destroyAsg/destroyAsgStage.js
-- [ ] packages/oracle/src/image/image.reader.js
-- [ ] packages/oracle/src/common/ocid/ocid.component.js
-- [ ] packages/oracle/src/instance/details/instance.details.controller.js
-- [ ] packages/oracle/src/serverGroup/configure/wizard/capacity/capacitySelector.component.js
-- [ ] packages/oracle/src/serverGroup/configure/wizard/basicSettings/basicSettings.controller.js
+## Phase 3: Cloud Provider Package Migration ✅
+### Oracle Package (~29 files) ✅
+- [x] packages/oracle/src/serverGroup/configure/serverGroup.configure.module.js → .ts
+- [x] packages/oracle/src/serverGroup/configure/serverGroupCommandBuilder.service.js → .ts
+- [x] packages/oracle/src/serverGroup/configure/serverGroupConfiguration.service.js → .ts
+- [x] packages/oracle/src/serverGroup/details/serverGroupDetails.controller.js → .ts
+- [x] packages/oracle/src/serverGroup/details/rollback/rollbackServerGroup.controller.js → .ts
+- [x] packages/oracle/src/pipeline/stages/bake/ociBakeStage.js → .ts
+- [x] packages/oracle/src/securityGroup/configure/createSecurityGroup.controller.js → .ts
+- [x] packages/oracle/src/pipeline/stages/bake/bakeExecutionDetails.controller.js → .ts
+- [x] packages/oracle/src/pipeline/stages/findAmi/findAmiStage.js → .ts
+- [x] packages/oracle/src/pipeline/stages/shrinkCluster/shrinkClusterStage.js → .ts
+- [x] packages/oracle/src/pipeline/stages/scaleDownCluster/scaleDownClusterStage.js → .ts
+- [x] packages/oracle/src/pipeline/stages/resizeAsg/resizeAsgStage.js → .ts
+- [x] packages/oracle/src/pipeline/stages/disableAsg/disableAsgStage.js → .ts
+- [x] packages/oracle/src/securityGroup/securityGroup.reader.js → .ts
+- [x] packages/oracle/src/securityGroup/securityGroup.transformer.js → .ts
+- [x] packages/oracle/src/common/footer.component.js → .ts
+- [x] packages/oracle/src/serverGroup/serverGroup.transformer.js → .ts
+- [x] packages/oracle/src/serverGroup/details/resize/resizeServerGroup.controller.js → .ts
+- [x] packages/oracle/src/pipeline/stages/findImageFromTags/oracleFindImageFromTagsStage.js → .ts
+- [x] packages/oracle/src/serverGroup/details/resize/resizeCapacity.component.js → .ts
+- [x] packages/oracle/src/pipeline/disableAsg/disableAsgStage.js → .ts
+- [x] packages/oracle/src/common/ocid/truncateOcid.filter.js → .ts
+- [x] packages/oracle/src/pipeline/stages/destroyAsg/destroyAsgStage.js → .ts
+- [x] packages/oracle/src/image/image.reader.js → .ts
+- [x] packages/oracle/src/common/ocid/ocid.component.js → .ts
+- [x] packages/oracle/src/instance/details/instance.details.controller.js → .ts
+- [x] packages/oracle/src/serverGroup/configure/wizard/capacity/capacitySelector.component.js → .ts
+- [x] packages/oracle/src/serverGroup/configure/wizard/basicSettings/basicSettings.controller.js → .ts
+- [x] packages/oracle/src/serverGroup/configure/wizard/cloneServerGroup.controller.js → .ts
 
 ### Amazon Package (~15 files) 📋
 - [ ] packages/amazon/src/securityGroup/securityGroup.transformer.js

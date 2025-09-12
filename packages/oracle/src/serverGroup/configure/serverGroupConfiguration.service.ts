@@ -1,39 +1,40 @@
-'use strict';
-
 import { module } from 'angular';
+import type { IQService } from 'angular';
 import _ from 'lodash';
 
+import type { Application } from '@spinnaker/core';
 import { AccountService, NetworkReader, SECURITY_GROUP_READER, SubnetReader } from '@spinnaker/core';
 import { OracleProviderSettings } from '../../oracle.settings';
 
 export const ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE =
   'spinnaker.oracle.serverGroup.configure.configuration.service';
 export const name = ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE; // for backwards compatibility
+
 module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [SECURITY_GROUP_READER]).factory(
   'oracleServerGroupConfigurationService',
   [
     '$q',
     'oracleImageReader',
     'securityGroupReader',
-    function ($q, oracleImageReader, securityGroupReader) {
+    function ($q: IQService, oracleImageReader: any, securityGroupReader: any) {
       const oracle = 'oracle';
 
-      const getShapes = (image) => {
+      const getShapes = (image: any) => {
         if (!image || !image.compatibleShapes) {
           return [];
         }
-        return image.compatibleShapes.map((shape) => {
+        return image.compatibleShapes.map((shape: any) => {
           return { name: shape };
         });
       };
 
-      const loadAndSelectRegions = (command, backingData) => {
+      const loadAndSelectRegions = (command: any, backingData: any) => {
         if (command.account) {
           const selectedAccountDetails = backingData.credentialsKeyedByAccount[command.account];
           if (!selectedAccountDetails) {
             return;
           }
-          backingData.filtered.regions = _.map(selectedAccountDetails.regions, (region) => {
+          backingData.filtered.regions = _.map(selectedAccountDetails.regions, (region: any) => {
             return { name: region.name };
           });
           if (selectedAccountDetails) {
@@ -42,12 +43,12 @@ module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [SECURITY_
         }
       };
 
-      const loadAvailabilityDomains = (command) => {
+      const loadAvailabilityDomains = (command: any) => {
         if (command.account && command.region) {
           AccountService.getAvailabilityZonesForAccountAndRegion(oracle, command.account, command.region).then(
-            (availDoms) => {
+            (availDoms: any) => {
               if (availDoms) {
-                command.backingData.filtered.availabilityDomains = availDoms.map((av) => {
+                command.backingData.filtered.availabilityDomains = availDoms.map((av: any) => {
                   return { name: av };
                 });
               } else {
@@ -59,15 +60,15 @@ module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [SECURITY_
         }
       };
 
-      const loadLoadBalancers = (command) => {
+      const loadLoadBalancers = (command: any) => {
         if (command.account && command.region) {
-          command.backingData.filtered.loadBalancers = command.backingData.loadBalancers.filter(function (lb) {
+          command.backingData.filtered.loadBalancers = command.backingData.loadBalancers.filter(function (lb: any) {
             return lb.region === command.region && lb.account === command.account;
           });
         }
       };
 
-      function configureCommand(application, command) {
+      function configureCommand(application: Application, command: any) {
         const defaults = command || {};
         const defaultCredentials =
           defaults.account || application.defaultCredentials.oracle || OracleProviderSettings.defaults.account;
@@ -84,7 +85,7 @@ module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [SECURITY_
             AccountService.getAvailabilityZonesForAccountAndRegion(oracle, defaultCredentials, defaultRegion),
           ])
           .then(function ([credentialsKeyedByAccount, networks, subnets, securityGroups, images, availDomains]) {
-            const backingData = {
+            const backingData: any = {
               credentialsKeyedByAccount,
               networks,
               subnets,
@@ -96,15 +97,14 @@ module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [SECURITY_
             backingData.accounts = _.keys(backingData.credentialsKeyedByAccount);
             backingData.filtered = {};
             loadAndSelectRegions(command, backingData);
-            backingData.filtered.availabilityDomains = _.map(backingData.availDomains, function (zone) {
+            backingData.filtered.availabilityDomains = _.map(backingData.availDomains, function (zone: any) {
               return { name: zone };
             });
 
             backingData.filterSubnets = function () {
               if (command.vpcId && command.availabilityDomain) {
-                return _.filter(backingData.subnets, {
-                  vcnId: command.vpcId,
-                  availabilityDomain: command.availabilityDomain,
+                return _.filter(backingData.subnets, (subnet: any) => {
+                  return subnet.vcnId === command.vpcId && subnet.availabilityDomain === command.availabilityDomain;
                 });
               }
               return backingData.subnets;
@@ -136,8 +136,8 @@ module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [SECURITY_
             backingData.subnetOnChange = function () {
               const subnet = _.find(backingData.subnets, { id: command.subnetId });
               const mySecGroups = backingData.securityGroups[command.account][oracle][command.region];
-              const secLists = [];
-              _.forEach(subnet.securityListIds, function (sid) {
+              const secLists: any[] = [];
+              _.forEach((subnet as any).securityListIds, function (sid: any) {
                 const sgRef = _.find(mySecGroups, { id: sid });
                 securityGroupReader
                   .getSecurityGroupDetails(
@@ -146,21 +146,20 @@ module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [SECURITY_
                     oracle,
                     command.region,
                     command.vpcId,
-                    sgRef.name,
+                    (sgRef as any).name,
                   )
-                  .then(function (sgd) {
+                  .then(function (sgd: any) {
                     secLists.push(sgd);
                     backingData.seclists = secLists;
                   });
               });
             };
 
-            backingData.findBackendSetsByLoadBalancerId = (loadBalancerId) => {
-              const lb = backingData.filtered.loadBalancers.find((lb) => lb.id === loadBalancerId);
+            backingData.findBackendSetsByLoadBalancerId = (loadBalancerId: string) => {
+              const lb = backingData.filtered.loadBalancers.find((lb: any) => lb.id === loadBalancerId);
               if (lb && lb.backendSets) {
-                //reduce the backendSets object to an array. The object is keyed by the backendSet name
-                const bsetArray = [];
-                Object.keys(lb.backendSets).reduce((arr, bsetName) => {
+                const bsetArray: any[] = [];
+                Object.keys(lb.backendSets).reduce((arr: any[], bsetName: string) => {
                   const bset = lb.backendSets[bsetName];
                   bset['name'] = bsetName;
                   arr.push(bset);
@@ -172,12 +171,12 @@ module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [SECURITY_
               }
             };
 
-            backingData.findLoadBalListenersByBackendSetName = (loadBalancerId, backendSetName) => {
-              const lb = backingData.filtered.loadBalancers.find((lb) => lb.id === loadBalancerId);
+            backingData.findLoadBalListenersByBackendSetName = (loadBalancerId: string, backendSetName: string) => {
+              const lb = backingData.filtered.loadBalancers.find((lb: any) => lb.id === loadBalancerId);
               if (lb && lb.listeners) {
                 return Object.keys(lb.listeners)
-                  .filter((lisName) => lb.listeners[lisName].defaultBackendSetName === backendSetName)
-                  .map((lisName) => lb.listeners[lisName]);
+                  .filter((lisName: string) => lb.listeners[lisName].defaultBackendSetName === backendSetName)
+                  .map((lisName: string) => lb.listeners[lisName]);
               } else {
                 return [];
               }
@@ -187,7 +186,6 @@ module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [SECURITY_
               if (command.loadBalancerId) {
                 backingData.filtered.backendSets = backingData.findBackendSetsByLoadBalancerId(command.loadBalancerId);
               } else {
-                //no backend set name should be set if no load balancer id is set
                 command.backendSetName = undefined;
                 backingData.backendSetOnChange();
                 backingData.filtered.backendSets = [];
@@ -202,8 +200,8 @@ module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE, [SECURITY_
             };
 
             backingData.filtered.images = backingData.images;
-            const shapesMap = {};
-            _.forEach(backingData.filtered.images, (image) => {
+            const shapesMap: any = {};
+            _.forEach(backingData.filtered.images, (image: any) => {
               shapesMap[image.id] = getShapes(image);
             });
             backingData.filtered.shapes = shapesMap;

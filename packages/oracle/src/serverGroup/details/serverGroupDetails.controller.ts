@@ -1,8 +1,10 @@
-'use strict';
-
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import type { StateService } from '@uirouter/core';
 import { module } from 'angular';
+import type { IScope } from 'angular';
+import _ from 'lodash';
 
+import type { Application } from '@spinnaker/core';
 import {
   ConfirmationModalService,
   NetworkReader,
@@ -19,6 +21,11 @@ import { ORACLE_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER } fr
 export const ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER =
   'spinnaker.oracle.serverGroup.details.controller';
 export const name = ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER; // for backwards compatibility
+
+interface IOracleServerGroupDetailsScope extends IScope {
+  $$destroyed: boolean;
+}
+
 module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
   UIROUTER_ANGULARJS,
   SERVER_GROUP_WRITER,
@@ -33,7 +40,15 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
   'serverGroup',
   'serverGroupWriter',
   'oracleImageReader',
-  function ($scope, $state, $uibModal, app, serverGroup, serverGroupWriter, oracleImageReader) {
+  function (
+    $scope: IOracleServerGroupDetailsScope,
+    $state: StateService,
+    $uibModal: any,
+    app: Application,
+    serverGroup: any,
+    serverGroupWriter: any,
+    oracleImageReader: any,
+  ) {
     const provider = 'oracle';
 
     this.application = app;
@@ -43,17 +58,13 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
       loading: true,
     };
 
-    /////////////////////////////////////////////////////////
-    // Fetch data
-    /////////////////////////////////////////////////////////
-
     const retrieveServerGroup = () => {
       return ServerGroupReader.getServerGroup(
         app.name,
         serverGroup.accountId,
         serverGroup.region,
         serverGroup.name,
-      ).then((details) => {
+      ).then((details: any) => {
         cancelLoader();
         details.account = serverGroup.accountId;
         this.serverGroup = details;
@@ -64,16 +75,16 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
     };
 
     const retrieveNetwork = () => {
-      NetworkReader.listNetworksByProvider(provider).then((networks) => {
+      NetworkReader.listNetworksByProvider(provider).then((networks: any[]) => {
         this.serverGroup.network = _.chain(networks)
           .filter({ account: this.serverGroup.account, id: this.serverGroup.launchConfig.vpcId })
           .head()
-          .value();
+          .value() as any;
       });
     };
 
     const retrieveSubnet = () => {
-      SubnetReader.getSubnetByIdAndProvider(this.serverGroup.launchConfig.subnetId, provider).then((subnet) => {
+      SubnetReader.getSubnetByIdAndProvider(this.serverGroup.launchConfig.subnetId, provider).then((subnet: any) => {
         this.serverGroup.subnet = subnet;
       });
     };
@@ -81,17 +92,13 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
     const retrieveImage = () => {
       oracleImageReader
         .getImage(this.serverGroup.launchConfig.imageId, this.serverGroup.region, this.serverGroup.account)
-        .then((image) => {
+        .then((image: any) => {
           if (!image) {
             image = { id: this.serverGroup.launchConfig.imageId, name: this.serverGroup.launchConfig.imageId };
           }
           this.serverGroup.image = image;
         });
     };
-
-    ////////////////////////////////////////////////////////////
-    // Actions. Triggered by server group details dropdown menu
-    ////////////////////////////////////////////////////////////
 
     this.destroyServerGroup = function destroyServerGroup() {
       const serverGroup = this.serverGroup;
@@ -151,7 +158,12 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
               account: this.serverGroup.account,
               region: this.serverGroup.region,
             });
-            const cluster = _.find(app.clusters, { name: sgSummary.cluster, account: this.serverGroup.account });
+            if (!sgSummary) return [];
+            const cluster = _.find(app.clusters, {
+              name: (sgSummary as any).cluster,
+              account: this.serverGroup.account,
+            });
+            if (!cluster) return [];
             return _.filter(cluster.serverGroups, { isDisabled: true, region: this.serverGroup.region });
           },
           application: () => app,
@@ -167,9 +179,9 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
         title: 'Disabling ' + serverGroup.name,
       };
 
-      const submitMethod = (params) => serverGroupWriter.disableServerGroup(serverGroup, app, params);
+      const submitMethod = (params: any) => serverGroupWriter.disableServerGroup(serverGroup, app, params);
 
-      const confirmationModalParams = {
+      const confirmationModalParams: any = {
         header: 'Really disable ' + serverGroup.name + '?',
         buttonText: 'Disable ' + serverGroup.name,
         account: serverGroup.account,
@@ -197,9 +209,9 @@ module(ORACLE_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_CONTROLLER, [
         title: 'Enabling ' + serverGroup.name,
       };
 
-      const submitMethod = (params) => serverGroupWriter.enableServerGroup(serverGroup, app, params);
+      const submitMethod = (params: any) => serverGroupWriter.enableServerGroup(serverGroup, app, params);
 
-      const confirmationModalParams = {
+      const confirmationModalParams: any = {
         header: 'Really enable ' + serverGroup.name + '?',
         buttonText: 'Enable ' + serverGroup.name,
         account: serverGroup.account,
