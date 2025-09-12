@@ -86,20 +86,46 @@ Migrating 570 JavaScript files to TypeScript across the Spinnaker Deck monorepo 
 - [x] packages/oracle/src/serverGroup/configure/wizard/basicSettings/basicSettings.controller.js → .ts
 - [x] packages/oracle/src/serverGroup/configure/wizard/cloneServerGroup.controller.js → .ts
 
-### Amazon Package (~15 files) 📋
-- [ ] packages/amazon/src/securityGroup/securityGroup.transformer.js
-- [ ] packages/amazon/src/securityGroup/details/securityGroupDetail.controller.js
-- [ ] packages/amazon/src/securityGroup/configure/CreateSecurityGroupCtrl.js
-- [ ] packages/amazon/src/securityGroup/configure/configSecurityGroup.mixin.controller.js
-- [ ] packages/amazon/src/securityGroup/configure/EditSecurityGroupCtrl.js
-- [ ] packages/amazon/src/securityGroup/configure/CreateSecurityGroup.controller.spec.js
-- [ ] packages/amazon/src/securityGroup/clone/cloneSecurityGroup.controller.js
 
-### Other Cloud Provider Packages 📋
-- [ ] packages/tencentcloud/src/search/searchResultFormatter.js
-- [ ] Additional files from Google, Azure, Kubernetes, etc. packages
+## Phase 4: Cloud Provider Package Migration ✅
+### Amazon Package (~34 files) ✅
+- [x] packages/amazon/src/securityGroup/securityGroup.transformer.js → .ts
+- [x] packages/amazon/src/securityGroup/details/securityGroupDetail.controller.js → .ts
+- [x] packages/amazon/src/securityGroup/configure/CreateSecurityGroupCtrl.js → .ts
+- [x] packages/amazon/src/securityGroup/configure/configSecurityGroup.mixin.controller.js → .ts
+- [x] packages/amazon/src/securityGroup/configure/EditSecurityGroupCtrl.js → .ts
+- [x] packages/amazon/src/securityGroup/clone/cloneSecurityGroup.controller.js → .ts
+- [x] packages/amazon/src/pipeline/stages/bake/awsBakeStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/bake/bakeExecutionDetails.controller.js → .ts
+- [x] packages/amazon/src/serverGroup/details/rollback/rollbackServerGroup.controller.js → .ts
+- [x] packages/amazon/src/serverGroup/details/advancedSettings/editAsgAdvancedSettings.modal.controller.js → .ts
+- [x] packages/amazon/src/serverGroup/details/securityGroup/editSecurityGroups.modal.controller.js → .ts
+- [x] packages/amazon/src/serverGroup/details/scheduledAction/editScheduledActions.modal.controller.js → .ts
+- [x] packages/amazon/src/instance/details/instance.details.controller.js → .ts
+- [x] packages/amazon/src/serverGroup/details/scalingProcesses/modifyScalingProcesses.controller.js → .ts
+- [x] packages/amazon/src/pipeline/stages/scaleDownCluster/awsScaleDownClusterStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/shrinkCluster/awsShrinkClusterStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/findAmi/awsFindAmiStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/modifyScalingProcess/modifyScalingProcessStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/findImageFromTags/awsFindImageFromTagsStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/destroyAsg/awsDestroyAsgStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/enableAsg/awsEnableAsgStage.js → .ts
 
-## Phase 4: Plugin SDK and Configuration 📋
+### Azure Package (~5 files) ✅
+- [x] packages/azure/src/securityGroup/securityGroup.transformer.js → .ts
+- [x] packages/azure/src/pipeline/stages/bake/azureBakeStage.js → .ts
+- [x] packages/azure/src/pipeline/stages/enableAsg/azureEnableAsgStage.js → .ts
+- [x] packages/azure/src/pipeline/stages/disableAsg/azureDisableAsgStage.js → .ts
+- [x] packages/azure/src/pipeline/stages/destroyAsg/azureDestroyAsgStage.js → .ts
+
+### Other Cloud Provider Packages ✅
+- [x] Google Package - Already fully converted to TypeScript (only webpack.config.js remains)
+- [x] Titus Package - Already fully converted to TypeScript (only webpack.config.js remains)
+- [x] Kubernetes Package - Already fully converted to TypeScript (only webpack.config.js remains)
+- [x] Tencentcloud Package - Already fully converted to TypeScript (only webpack.config.js remains)
+- [x] Other cloud provider packages - Already fully converted to TypeScript
+
+## Phase 5: Plugin SDK and Configuration 📋
 - [ ] packages/pluginsdk/scaffold/scaffold.prettierrc.js
 - [ ] packages/pluginsdk/scaffold/rollup.config.js
 - [ ] packages/pluginsdk/scaffold/.eslintrc.js
@@ -109,7 +135,7 @@ Migrating 570 JavaScript files to TypeScript across the Spinnaker Deck monorepo 
 - [ ] packages/pluginsdk/pluginconfig/huskyrc.js
 - [ ] packages/pluginsdk/rollup.config.js
 
-## Phase 5: Import Path Cleanup and Strictness Graduation 📋
+## Phase 6: Import Path Cleanup and Strictness Graduation 📋
 - [ ] Search for remaining .js import references
 - [ ] Update import paths incrementally
 - [ ] Enable strictNullChecks: true
