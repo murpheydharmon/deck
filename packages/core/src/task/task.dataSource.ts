@@ -1,4 +1,5 @@
 import * as angular from 'angular';
+import type { IQService } from 'angular';
 
 import { ApplicationDataSourceRegistry } from '../application/service/ApplicationDataSourceRegistry';
 import { CLUSTER_SERVICE } from '../cluster/cluster.service';
@@ -7,16 +8,17 @@ import { TaskReader } from './task.read.service';
 
 export const CORE_TASK_TASK_DATASOURCE = 'spinnaker.core.task.dataSource';
 export const name = CORE_TASK_TASK_DATASOURCE; // for backwards compatibility
+
 angular.module(CORE_TASK_TASK_DATASOURCE, [CLUSTER_SERVICE]).run([
   '$q',
   'clusterService',
-  function ($q, clusterService) {
-    const addTasks = (application, tasks) => {
+  function ($q: IQService, clusterService: any) {
+    const addTasks = (_application: any, tasks: any[]) => {
       return $q.when(angular.isArray(tasks) ? tasks : []);
     };
 
-    const loadPaginatedTasks = async (application, page = 1) => {
-      let limitPerPage = SETTINGS.tasksViewLimitPerPage;
+    const loadPaginatedTasks = async (application: any, page = 1): Promise<any[]> => {
+      const limitPerPage = SETTINGS.tasksViewLimitPerPage;
       const tasks = await TaskReader.getTasks(application.name, [], limitPerPage, page);
       if (tasks.length === limitPerPage) {
         return tasks.concat(await loadPaginatedTasks(application, page + 1));
@@ -25,8 +27,8 @@ angular.module(CORE_TASK_TASK_DATASOURCE, [CLUSTER_SERVICE]).run([
       }
     };
 
-    const loadTasks = (application, page = 1) => {
-      let limitPerPage = SETTINGS.tasksViewLimitPerPage;
+    const loadTasks = (application: any, page = 1) => {
+      const limitPerPage = SETTINGS.tasksViewLimitPerPage;
       if (limitPerPage === undefined) {
         return TaskReader.getTasks(application.name);
       } else {
@@ -34,15 +36,15 @@ angular.module(CORE_TASK_TASK_DATASOURCE, [CLUSTER_SERVICE]).run([
       }
     };
 
-    const loadRunningTasks = (application) => {
+    const loadRunningTasks = (application: any) => {
       return TaskReader.getRunningTasks(application.name);
     };
 
-    const addRunningTasks = (application, data) => {
+    const addRunningTasks = (_application: any, data: any) => {
       return $q.when(data);
     };
 
-    const runningTasksLoaded = (application) => {
+    const runningTasksLoaded = (application: any) => {
       clusterService.addTasksToServerGroups(application);
       application.getDataSource('serverGroups').dataUpdated();
     };

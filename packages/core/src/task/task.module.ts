@@ -1,5 +1,3 @@
-'use strict';
-
 import { module } from 'angular';
 
 import { CORE_TASK_MODAL_REASON_DIRECTIVE } from './modal/reason.directive';
@@ -15,6 +13,7 @@ import './tasks.less';
 
 export const CORE_TASK_TASK_MODULE = 'spinnaker.core.task';
 export const name = CORE_TASK_TASK_MODULE; // for backwards compatibility
+
 module(CORE_TASK_TASK_MODULE, [
   CORE_TASK_VERIFICATION_USERVERIFICATION_DIRECTIVE,
   CORE_TASK_MODAL_REASON_DIRECTIVE,

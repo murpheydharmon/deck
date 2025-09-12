@@ -1,6 +1,5 @@
-'use strict';
-
 import { module } from 'angular';
+import type { IQService, IScope } from 'angular';
 import { size } from 'lodash';
 
 import {
@@ -16,6 +15,14 @@ import { ORACLE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './b
 
 export const ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE = 'spinnaker.oracle.pipeline.stage.bakeStage';
 export const name = ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE; // for backwards compatibility
+
+interface IOracleBakeStageScope extends IScope {
+  stage: any;
+  viewState: any;
+  baseOsOptions: any;
+  accounts: any[];
+}
+
 module(ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE, [ORACLE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER])
   .config(function () {
     Registry.pipeline.registerStage({
@@ -36,13 +43,13 @@ module(ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE, [ORACLE_PIPELINE_STAGES_BAKE_BA
         { type: 'requiredField', fieldName: 'amiName', fieldLabel: 'Image Name' },
       ],
       restartable: true,
-    });
+    } as any);
   })
   .controller('oracleBakeStageCtrl', [
     '$scope',
     '$q',
     '$uibModal',
-    function ($scope, $q, $uibModal) {
+    function ($scope: IOracleBakeStageScope, $q: IQService, $uibModal: any) {
       const provider = 'oracle';
 
       if (!$scope.stage.cloudProvider) {
@@ -80,9 +87,8 @@ module(ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE, [ORACLE_PIPELINE_STAGES_BAKE_BA
             $scope.accounts = accounts;
 
             if ($scope.stage.accountName) {
-              AccountService.getRegionsForAccount($scope.stage.accountName).then(function (regions) {
+              AccountService.getRegionsForAccount($scope.stage.accountName).then(function (regions: any[]) {
                 if (Array.isArray(regions) && regions.length != 0) {
-                  // there is exactly one region per account
                   $scope.stage.region = regions[0].name;
                 }
               });
@@ -93,14 +99,13 @@ module(ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE, [ORACLE_PIPELINE_STAGES_BAKE_BA
         );
       }
 
-      this.getBaseOsDescription = function (baseOsOption) {
+      this.getBaseOsDescription = function (baseOsOption: any) {
         return baseOsOption.id + (baseOsOption.shortDescription ? ' (' + baseOsOption.shortDescription + ')' : '');
       };
 
       this.accountUpdated = function () {
-        AccountService.getRegionsForAccount($scope.stage.accountName).then(function (regions) {
+        AccountService.getRegionsForAccount($scope.stage.accountName).then(function (regions: any[]) {
           if (Array.isArray(regions) && regions.length != 0) {
-            // there is exactly one region per account
             $scope.stage.region = regions[0].name;
           }
         });
@@ -124,13 +129,13 @@ module(ORACLE_PIPELINE_STAGES_BAKE_OCIBAKESTAGE, [ORACLE_PIPELINE_STAGES_BAKE_BA
               },
             },
           })
-          .result.then(function (extendedAttribute) {
+          .result.then(function (extendedAttribute: any) {
             $scope.stage.extendedAttributes[extendedAttribute.key] = extendedAttribute.value;
           })
           .catch(() => {});
       };
 
-      this.removeExtendedAttribute = function (key) {
+      this.removeExtendedAttribute = function (key: string) {
         delete $scope.stage.extendedAttributes[key];
       };
 

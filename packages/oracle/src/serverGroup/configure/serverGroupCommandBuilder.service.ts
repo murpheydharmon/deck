@@ -1,8 +1,8 @@
-'use strict';
-
 import * as angular from 'angular';
+import type { IQService } from 'angular';
 import _ from 'lodash';
 
+import type { Application } from '@spinnaker/core';
 import { NameUtils } from '@spinnaker/core';
 
 import { OracleProviderSettings } from '../../oracle.settings';
@@ -10,20 +10,46 @@ import { OracleProviderSettings } from '../../oracle.settings';
 export const ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE =
   'spinnaker.oracle.serverGroupCommandBuilder.service';
 export const name = ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE; // for backwards compatibility
+
+interface IOracleServerGroupCommand {
+  account: string;
+  application: string;
+  capacity: {
+    desired: number;
+  };
+  region: string;
+  selectedProvider: string;
+  viewState: {
+    mode: string;
+    disableStrategySelection: boolean;
+    disableImageSelection?: boolean;
+    submitButtonLabel?: string;
+    templatingEnabled?: boolean;
+  };
+  shape?: string;
+  strategy?: string;
+  stack?: string;
+  vpcId?: string;
+  subnetId?: string;
+  availabilityDomain?: string;
+  sshAuthorizedKeys?: string;
+}
+
 angular
   .module(ORACLE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE, [])
   .factory('oracleServerGroupCommandBuilder', [
     '$q',
-    function ($q) {
+    function ($q: IQService) {
       const oracle = 'oracle';
 
-      function buildNewServerGroupCommand(application, defaults) {
-        defaults = defaults || {};
-
+      function buildNewServerGroupCommand(
+        application: Application,
+        defaults: any = {},
+      ): PromiseLike<IOracleServerGroupCommand> {
         const defaultAccount = defaults.account || OracleProviderSettings.defaults.account;
         const defaultRegion = defaults.region || OracleProviderSettings.defaults.region;
 
-        const command = {
+        const command: IOracleServerGroupCommand = {
           account: defaultAccount,
           application: application.name,
           capacity: {
@@ -40,11 +66,14 @@ angular
         return $q.when(command);
       }
 
-      function buildServerGroupCommandFromExisting(application, serverGroup, mode) {
-        mode = mode || 'clone';
+      function buildServerGroupCommandFromExisting(
+        application: Application,
+        serverGroup: any,
+        mode = 'clone',
+      ): PromiseLike<IOracleServerGroupCommand> {
         const serverGroupName = NameUtils.parseServerGroupName(serverGroup.name);
 
-        const command = {
+        const command: IOracleServerGroupCommand = {
           account: serverGroup.account,
           application: application.name,
           shape: serverGroup.launchConfig.shape,
@@ -67,7 +96,10 @@ angular
         return $q.when(command);
       }
 
-      function buildServerGroupCommandFromPipeline(application, originalCluster) {
+      function buildServerGroupCommandFromPipeline(
+        application: Application,
+        originalCluster: any,
+      ): PromiseLike<IOracleServerGroupCommand> {
         const pipelineCluster = _.cloneDeep(originalCluster);
         const commandDefaults = { account: pipelineCluster.account, region: pipelineCluster.region };
         return buildNewServerGroupCommand(application, commandDefaults).then((command) => {
@@ -87,7 +119,7 @@ angular
         });
       }
 
-      function buildNewServerGroupCommandForPipeline() {
+      function buildNewServerGroupCommandForPipeline(): PromiseLike<any> {
         return $q.when({
           viewState: {
             requiresTemplateSelection: true,
