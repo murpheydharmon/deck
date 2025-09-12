@@ -14,7 +14,7 @@ Migrating 570 JavaScript files to TypeScript across the Spinnaker Deck monorepo 
 - [x] Document JavaScript files by package priority
 - [x] Establish naming conventions (.js → .ts, .jsx → .tsx)
 
-## Phase 2: Core Foundation Migration (Package: core) 🔄
+## Phase 2: Core Foundation Migration (Package: core) ✅
 ### Core Validation Module (~8 files)
 - [x] packages/core/src/validation/validateUnique.directive.js → .ts
 - [x] packages/core/src/validation/triggerValidation.directive.js → .ts
