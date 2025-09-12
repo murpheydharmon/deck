@@ -1,15 +1,13 @@
-'use strict';
-
 import { ProjectReader } from './service/ProjectReader';
 
 describe('Controller: Projects', function () {
-  beforeEach(window.module(require('./projects.controller').name, require('angular-ui-bootstrap')));
+  beforeEach(window.module(require('./projects.controller').name, 'ui.bootstrap'));
 
   describe('filtering', function () {
-    var deck = { name: 'deck', email: 'a@netflix.com', createTs: new Date(2) },
-      oort = { name: 'oort', email: 'b@netflix.com', createTs: new Date(3) },
-      mort = { name: 'mort', email: 'c@netflix.com', createTs: new Date(1) },
-      projectList = [deck, oort, mort];
+    const deck = { name: 'deck', email: 'a@netflix.com', createTs: new Date(2) };
+    const oort = { name: 'oort', email: 'b@netflix.com', createTs: new Date(3) };
+    const mort = { name: 'mort', email: 'c@netflix.com', createTs: new Date(1) };
+    const projectList = [deck, oort, mort];
 
     // Initialize the controller and a mock scope
     beforeEach(
@@ -36,7 +34,7 @@ describe('Controller: Projects', function () {
     );
 
     it('sets projectsLoaded flag when projects retrieved and added to scope', function () {
-      var $scope = this.$scope;
+      const $scope = this.$scope;
 
       expect($scope.projectsLoaded).toBe(false);
       expect($scope.projects).toBeUndefined();
@@ -49,8 +47,8 @@ describe('Controller: Projects', function () {
     });
 
     it('filters projects by name or email', function () {
-      var $scope = this.$scope,
-        ctrl = this.ctrl;
+      const $scope = this.$scope;
+      const ctrl = this.ctrl;
 
       $scope.viewState.projectFilter = 'a@netflix.com';
       $scope.$digest();
@@ -63,8 +61,8 @@ describe('Controller: Projects', function () {
     });
 
     it('sorts and filters projects', function () {
-      var $scope = this.$scope,
-        ctrl = this.ctrl;
+      const $scope = this.$scope;
+      const ctrl = this.ctrl;
 
       $scope.viewState.sortModel.key = '-name';
       $scope.$digest();

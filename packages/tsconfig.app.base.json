@@ -10,8 +10,9 @@
 
     // strict checks
     "noImplicitAny": true,
-    "noImplicitThis": false, // should really get to a place where we can turn this on
-    "strictNullChecks": false, // should really get to a place where we can turn this on
+    "noImplicitThis": true, // should really get to a place where we can turn this on
+    "strictNullChecks": true, // should really get to a place where we can turn this on
+    "strict": true, // Full TypeScript strictness enabled
 
     // module resolution
     "allowSyntheticDefaultImports": true,

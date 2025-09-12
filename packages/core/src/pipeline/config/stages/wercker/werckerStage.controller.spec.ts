@@ -9,7 +9,7 @@ import { WERCKER_STAGE, WerckerStage } from './werckerStage';
 describe('Wercker Stage Controller', () => {
   let $scope: IScope, $q: IQService, $ctrl: IControllerService;
 
-  beforeEach(mock.module(WERCKER_STAGE, require('angular-ui-bootstrap')));
+  beforeEach(mock.module(WERCKER_STAGE, 'ui.bootstrap'));
 
   beforeEach(
     mock.inject(($controller: IControllerService, $rootScope: IRootScopeService, _$q_: IQService) => {
@@ -123,7 +123,7 @@ describe('Wercker Stage Controller', () => {
       const params: IParameterDefinitionList[] = [
         { name: 'overridden', defaultValue: 'z' },
         { name: 'notSet', defaultValue: 'a' },
-        { name: 'noDefault', defaultValue: null },
+        { name: 'noDefault', defaultValue: '' },
       ];
       const jobConfig = {
         parameterDefinitionList: params,
