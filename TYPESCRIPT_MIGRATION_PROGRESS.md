@@ -16,19 +16,19 @@ Migrating 570 JavaScript files to TypeScript across the Spinnaker Deck monorepo 
 
 ## Phase 2: Core Foundation Migration (Package: core) 🔄
 ### Core Validation Module (~8 files)
-- [ ] packages/core/src/validation/validateUnique.directive.js
-- [ ] packages/core/src/validation/triggerValidation.directive.js
-- [ ] packages/core/src/validation/validationError.directive.js
+- [x] packages/core/src/validation/validateUnique.directive.js → .ts
+- [x] packages/core/src/validation/triggerValidation.directive.js → .ts
+- [x] packages/core/src/validation/validationError.directive.js → .ts
 - [ ] packages/core/src/validation/validateUnique.directive.spec.js
-- [ ] packages/core/src/validation/validation.module.js
+- [x] packages/core/src/validation/validation.module.js → .ts
 
 ### Core Task Module (~10 files)
-- [ ] packages/core/src/task/tasks.controller.js
-- [ ] packages/core/src/task/task.dataSource.js
+- [x] packages/core/src/task/tasks.controller.js → .ts
+- [x] packages/core/src/task/task.dataSource.js → .ts
 - [ ] packages/core/src/task/task.read.service.spec.js
 - [ ] packages/core/src/task/tasks.controller.spec.js
-- [ ] packages/core/src/task/task.module.js
-- [ ] packages/core/src/task/taskProgressBar.directive.js
+- [x] packages/core/src/task/task.module.js → .ts
+- [x] packages/core/src/task/taskProgressBar.directive.js → .ts
 - [ ] packages/core/src/task/modal/reason.directive.js
 - [ ] packages/core/src/task/verification/userVerification.directive.spec.js
 - [ ] packages/core/src/task/verification/userVerification.directive.js
