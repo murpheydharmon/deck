@@ -95,6 +95,7 @@ module.exports = function (config) {
       require('karma-sourcemap-loader'),
       require('karma-super-dots-reporter'),
       require('karma-mocha-reporter'),
+      require('karma-coverage-istanbul-reporter'),
     ],
 
     // list of files / patterns to exclude
@@ -111,7 +112,7 @@ module.exports = function (config) {
     // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
     logLevel: config.DEBUG,
 
-    reporters: ['super-dots', 'mocha'],
+    reporters: ['super-dots', 'mocha', 'coverage-istanbul'],
     mochaReporter: {
       output: 'minimal',
     },
@@ -119,6 +120,21 @@ module.exports = function (config) {
     // put test results in a well known file if 'jenkins' reporter is being used
     junitReporter: {
       outputFile: 'test-results.xml',
+    },
+
+    coverageIstanbulReporter: {
+      dir: 'coverage/',
+      reports: ['html', 'lcov', 'text-summary'],
+      fixWebpackSourcePaths: true,
+      thresholds: {
+        emitWarning: false,
+        global: {
+          statements: 80,
+          lines: 80,
+          branches: 70,
+          functions: 75
+        }
+      }
     },
 
     client: {

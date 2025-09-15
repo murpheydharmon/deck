@@ -34,6 +34,10 @@ npm-debug.log
 # Test Results
 test-results.xml
 
+# Coverage reports
+coverage/
+.nyc_output/
+
 # Functional Test Artifacts
 *.browser.log
 test/functional/cypress/videos/**/*
