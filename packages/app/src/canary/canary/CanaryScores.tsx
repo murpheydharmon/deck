@@ -23,7 +23,8 @@ export class CanaryScores extends React.Component<ICanaryScoresProps> {
     const hasExpressions =
       this.isExpression(this.props.unhealthyScore) || this.isExpression(this.props.successfulScore);
 
-    let successful: number, unhealthy: number;
+    let successful = 0;
+    let unhealthy = 0;
     if (!hasExpressions) {
       successful = parseInt(this.props.successfulScore, 10);
       unhealthy = parseInt(this.props.unhealthyScore, 10);
@@ -112,11 +113,11 @@ export class CanaryScores extends React.Component<ICanaryScoresProps> {
   };
 
   private isSuccessfulScoreValid(successfulScore: number, unhealthyScore: number): boolean {
-    return successfulScore && (!unhealthyScore || successfulScore > unhealthyScore) && successfulScore <= 100;
+    return !!successfulScore && (!unhealthyScore || successfulScore > unhealthyScore) && successfulScore <= 100;
   }
 
   private isUnhealthyScoreValid(successfulScore: number, unhealthyScore: number): boolean {
-    return unhealthyScore && (!successfulScore || unhealthyScore < successfulScore) && unhealthyScore >= 0;
+    return !!unhealthyScore && (!successfulScore || unhealthyScore < successfulScore) && unhealthyScore >= 0;
   }
 
   private isExpression(scoreValue: string): boolean {

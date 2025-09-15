@@ -1,8 +1,8 @@
-'use strict';
-
 import { module } from 'angular';
+import type { IQService, IScope } from 'angular';
 import _ from 'lodash';
 
+import type { Application } from '@spinnaker/core';
 import { AuthenticationService } from '@spinnaker/core';
 import { BakeExecutionLabel, BakeryReader, PipelineTemplates, Registry, SETTINGS } from '@spinnaker/core';
 import { AWSProviderSettings } from '../../../aws.settings';
@@ -11,6 +11,20 @@ import { AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './b
 
 export const AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE = 'spinnaker.amazon.pipeline.stage.bakeStage';
 export const name = AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE; // for backwards compatibility
+
+interface IAWSBakeStageScope extends IScope {
+  stage: any;
+  application: Application;
+  pipeline: any;
+  regions: any[];
+  storeTypes: any[];
+  baseOsOptions: any;
+  baseLabelOptions: any;
+  vmTypes: any[];
+  viewState: any;
+  showAdvancedOptions: boolean;
+}
+
 module(AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE, [AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER])
   .config(function () {
     Registry.pipeline.registerStage({
@@ -21,7 +35,7 @@ module(AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE, [AMAZON_PIPELINE_STAGES_BAKE_BA
       templateUrl: require('./bakeStage.html'),
       executionDetailsUrl: require('./bakeExecutionDetails.html'),
       executionLabelComponent: BakeExecutionLabel,
-      extraLabelLines: (stage) => {
+      extraLabelLines: (stage: any) => {
         return stage.masterStage.context.allPreviouslyBaked || stage.masterStage.context.somePreviouslyBaked ? 1 : 0;
       },
       supportsCustomTimeout: true,
@@ -31,13 +45,9 @@ module(AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE, [AMAZON_PIPELINE_STAGES_BAKE_BA
         {
           type: 'upstreamVersionProvided',
           checkParentTriggers: true,
-          getMessage: (labels) =>
-            'Bake stages should always have a stage or trigger preceding them that provides version information: ' +
-            '<ul>' +
-            labels.map((label) => `<li>${label}</li>`).join('') +
-            '</ul>' +
-            'Otherwise, Spinnaker will bake and deploy the most-recently built package.',
-        },
+          message:
+            'Bake stages should always have a stage or trigger preceding them that provides version information. Otherwise, Spinnaker will bake and deploy the most-recently built package.',
+        } as any,
       ],
       restartable: true,
     });
@@ -46,7 +56,7 @@ module(AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE, [AMAZON_PIPELINE_STAGES_BAKE_BA
     '$scope',
     '$q',
     '$uibModal',
-    function ($scope, $q, $uibModal) {
+    function ($scope: IAWSBakeStageScope, $q: IQService, $uibModal: any) {
       $scope.stage.extendedAttributes = $scope.stage.extendedAttributes || {};
       $scope.stage.regions = ($scope.stage.regions && $scope.stage.regions.sort()) || [];
 
@@ -95,7 +105,7 @@ module(AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE, [AMAZON_PIPELINE_STAGES_BAKE_BA
             $scope.stage.baseOs = $scope.baseOsOptions[0].id;
           } else if (
             $scope.stage.baseOs &&
-            !($scope.baseOsOptions || []).find((baseOs) => baseOs.id === $scope.stage.baseOs)
+            !($scope.baseOsOptions || []).find((baseOs: any) => baseOs.id === $scope.stage.baseOs)
           ) {
             $scope.baseOsOptions.push({
               id: $scope.stage.baseOs,
@@ -120,14 +130,13 @@ module(AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE, [AMAZON_PIPELINE_STAGES_BAKE_BA
         if ($scope.stage.storeType === 'ebs' && $scope.stage.cloudProviderType !== 'aws') {
           $scope.stage.cloudProviderType = 'aws';
         }
-        // Since the selector computes using stage as an input, it needs to be able to recompute roscoMode on updates
         if (typeof SETTINGS.feature.roscoSelector === 'function') {
           $scope.viewState.roscoMode = SETTINGS.feature.roscoSelector($scope.stage);
         }
       }
 
       function deleteEmptyProperties() {
-        _.forOwn($scope.stage, function (val, key) {
+        _.forOwn($scope.stage, function (val: any, key: string) {
           if (val === '') {
             delete $scope.stage[key];
           }
@@ -149,11 +158,11 @@ module(AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE, [AMAZON_PIPELINE_STAGES_BAKE_BA
       }
 
       function setVmTypes() {
-        if ($scope.baseOsOptions.length && $scope.baseOsOptions.every(({ vmTypes }) => vmTypes)) {
+        if ($scope.baseOsOptions.length && $scope.baseOsOptions.every(({ vmTypes }: any) => vmTypes)) {
           const allVmTypes =
             $scope.baseOsOptions.length &&
-            new Set($scope.baseOsOptions.reduce((types, { vmTypes }) => types.concat(vmTypes), []));
-          const baseOs = $scope.baseOsOptions.find(({ id }) => id === $scope.stage.baseOs);
+            new Set($scope.baseOsOptions.reduce((types: any[], { vmTypes }: any) => types.concat(vmTypes), []));
+          const baseOs = $scope.baseOsOptions.find(({ id }: any) => id === $scope.stage.baseOs);
 
           $scope.viewState.showVmTypeSelector = allVmTypes.size > 1;
           $scope.vmTypes = baseOs.vmTypes;
@@ -181,13 +190,13 @@ module(AMAZON_PIPELINE_STAGES_BAKE_AWSBAKESTAGE, [AMAZON_PIPELINE_STAGES_BAKE_BA
               },
             },
           })
-          .result.then(function (extendedAttribute) {
+          .result.then(function (extendedAttribute: any) {
             $scope.stage.extendedAttributes[extendedAttribute.key] = extendedAttribute.value;
           })
           .catch(() => {});
       };
 
-      this.removeExtendedAttribute = function (key) {
+      this.removeExtendedAttribute = function (key: string) {
         delete $scope.stage.extendedAttributes[key];
       };
 

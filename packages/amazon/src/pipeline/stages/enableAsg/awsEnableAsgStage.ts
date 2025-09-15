@@ -1,11 +1,24 @@
-'use strict';
-
 import { module } from 'angular';
+import type { IScope } from 'angular';
 
+import type { Application } from '@spinnaker/core';
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
 export const AMAZON_PIPELINE_STAGES_ENABLEASG_AWSENABLEASGSTAGE = 'spinnaker.amazon.pipeline.stage.enableAsgStage';
 export const name = AMAZON_PIPELINE_STAGES_ENABLEASG_AWSENABLEASGSTAGE; // for backwards compatibility
+
+interface IAwsEnableAsgScope extends IScope {
+  stage: any;
+  application: Application;
+  accounts: any[];
+  state: {
+    accounts: boolean;
+    regionsLoaded: boolean;
+  };
+  targets: any[];
+  accountUpdated: () => void;
+}
+
 module(AMAZON_PIPELINE_STAGES_ENABLEASG_AWSENABLEASGSTAGE, [])
   .config(function () {
     Registry.pipeline.registerStage({
@@ -20,11 +33,11 @@ module(AMAZON_PIPELINE_STAGES_ENABLEASG_AWSENABLEASGSTAGE, [])
         { type: 'requiredField', fieldName: 'regions' },
         { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
       ],
-    });
+    } as any);
   })
   .controller('awsEnableAsgStageCtrl', [
     '$scope',
-    function ($scope) {
+    function ($scope: IAwsEnableAsgScope) {
       const ctrl = this;
 
       const stage = $scope.stage;
@@ -34,7 +47,7 @@ module(AMAZON_PIPELINE_STAGES_ENABLEASG_AWSENABLEASGSTAGE, [])
         regionsLoaded: false,
       };
 
-      AccountService.listAccounts('aws').then(function (accounts) {
+      AccountService.listAccounts('aws').then(function (accounts: any[]) {
         $scope.accounts = accounts;
         $scope.state.accounts = true;
       });

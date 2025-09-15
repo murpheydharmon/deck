@@ -1,11 +1,23 @@
-'use strict';
-
 import { module } from 'angular';
+import type { IScope } from 'angular';
 
+import type { Application } from '@spinnaker/core';
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
 export const AZURE_PIPELINE_STAGES_DESTROYASG_AZUREDESTROYASGSTAGE = 'spinnaker.azure.pipeline.stage.destroyAsgStage';
 export const name = AZURE_PIPELINE_STAGES_DESTROYASG_AZUREDESTROYASGSTAGE; // for backwards compatibility
+
+interface IAzureDestroyAsgScope extends IScope {
+  stage: any;
+  application: Application;
+  accounts: any[];
+  state: {
+    accounts: boolean;
+    regionsLoaded: boolean;
+  };
+  targets: any[];
+}
+
 module(AZURE_PIPELINE_STAGES_DESTROYASG_AZUREDESTROYASGSTAGE, [])
   .config(function () {
     Registry.pipeline.registerStage({
@@ -13,8 +25,8 @@ module(AZURE_PIPELINE_STAGES_DESTROYASG_AZUREDESTROYASGSTAGE, [])
       cloudProvider: 'azure',
       templateUrl: require('./destroyAsgStage.html'),
       executionStepLabelUrl: require('./destroyAsgStepLabel.html'),
-      accountExtractor: (stage) => [stage.context.credentials],
-      configAccountExtractor: (stage) => [stage.credentials],
+      accountExtractor: (stage: any) => [stage.context.credentials],
+      configAccountExtractor: (stage: any) => [stage.credentials],
       validators: [
         {
           type: 'targetImpedance',
@@ -26,11 +38,11 @@ module(AZURE_PIPELINE_STAGES_DESTROYASG_AZUREDESTROYASGSTAGE, [])
         { type: 'requiredField', fieldName: 'regions' },
         { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
       ],
-    });
+    } as any);
   })
   .controller('azureDestroyAsgStageCtrl', [
     '$scope',
-    function ($scope) {
+    function ($scope: IAzureDestroyAsgScope) {
       const ctrl = this;
 
       const stage = $scope.stage;
@@ -40,15 +52,14 @@ module(AZURE_PIPELINE_STAGES_DESTROYASG_AZUREDESTROYASGSTAGE, [])
         regionsLoaded: false,
       };
 
-      AccountService.listAccounts('azure').then(function (accounts) {
+      AccountService.listAccounts('azure').then(function (accounts: any[]) {
         $scope.accounts = accounts;
         $scope.state.accounts = true;
       });
 
       ctrl.accountUpdated = function () {
-        AccountService.getAccountDetails(stage.credentials).then(function (details) {
+        AccountService.getAccountDetails(stage.credentials).then(function (details: any) {
           stage.regions = [details.org];
-          //        stage.regions = ['eastus', 'westus'];
         });
       };
 
@@ -57,7 +68,7 @@ module(AZURE_PIPELINE_STAGES_DESTROYASG_AZUREDESTROYASGSTAGE, [])
       stage.regions = stage.regions || [];
       stage.cloudProvider = 'azure';
 
-      stage.interestingHealthProviderNames = []; // bypass the check for now; will change this later to ['azureService']
+      stage.interestingHealthProviderNames = [];
 
       if (!stage.credentials && $scope.application.defaultCredentials.azure) {
         stage.credentials = $scope.application.defaultCredentials.azure;

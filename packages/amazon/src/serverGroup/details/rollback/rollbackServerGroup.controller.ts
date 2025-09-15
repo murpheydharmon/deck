@@ -1,13 +1,25 @@
-'use strict';
-
 import { module } from 'angular';
+import type { IScope } from 'angular';
 
 import { get } from 'lodash';
+import type { Application } from '@spinnaker/core';
 import { SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
 
 export const AMAZON_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER =
   'spinnaker.amazon.serverGroup.details.rollback.controller';
 export const name = AMAZON_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER; // for backwards compatibility
+
+interface IAWSRollbackServerGroupScope extends IScope {
+  serverGroup: any;
+  disabledServerGroups: any[];
+  allServerGroups: any[];
+  verification: any;
+  command: any;
+  taskMonitor: TaskMonitor;
+  previousServerGroup?: any;
+  minHealthy: (percent: number) => number;
+}
+
 module(AMAZON_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER, [SERVER_GROUP_WRITER]).controller(
   'awsRollbackServerGroupCtrl',
   [
@@ -20,14 +32,14 @@ module(AMAZON_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER, [SERV
     'disabledServerGroups',
     'allServerGroups',
     function (
-      $scope,
-      $uibModalInstance,
-      serverGroupWriter,
-      application,
-      serverGroup,
-      previousServerGroup,
-      disabledServerGroups,
-      allServerGroups,
+      $scope: IAWSRollbackServerGroupScope,
+      $uibModalInstance: any,
+      serverGroupWriter: any,
+      application: Application,
+      serverGroup: any,
+      previousServerGroup: any,
+      disabledServerGroups: any[],
+      allServerGroups: any[],
     ) {
       $scope.serverGroup = serverGroup;
       $scope.disabledServerGroups = disabledServerGroups.sort((a, b) => b.name.localeCompare(a.name));
@@ -39,30 +51,32 @@ module(AMAZON_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER, [SERV
       let rollbackType = 'EXPLICIT';
 
       if (allServerGroups.length === 0 && serverGroup.entityTags) {
-        const previousServerGroup = get(serverGroup, 'entityTags.creationMetadata.value.previousServerGroup');
-        if (previousServerGroup) {
+        const previousServerGroupData = get(serverGroup, 'entityTags.creationMetadata.value.previousServerGroup');
+        if (previousServerGroupData) {
           rollbackType = 'PREVIOUS_IMAGE';
           $scope.previousServerGroup = {
-            name: previousServerGroup.name,
-            imageName: previousServerGroup.imageName,
+            name: (previousServerGroupData as any).name,
+            imageName: (previousServerGroupData as any).imageName,
           };
 
-          if (previousServerGroup.imageId && previousServerGroup.imageId !== previousServerGroup.imageName) {
-            $scope.previousServerGroup.imageId = previousServerGroup.imageId;
+          if (
+            (previousServerGroupData as any).imageId &&
+            (previousServerGroupData as any).imageId !== (previousServerGroupData as any).imageName
+          ) {
+            $scope.previousServerGroup.imageId = (previousServerGroupData as any).imageId;
           }
 
-          const buildNumber = get(previousServerGroup, 'buildInfo.jenkins.number');
+          const buildNumber = get(previousServerGroupData, 'buildInfo.jenkins.number');
           if (buildNumber) {
             $scope.previousServerGroup.buildNumber = buildNumber;
           }
         }
       }
 
-      let healthyPercent;
+      let healthyPercent: number;
       if (desired < 10) {
         healthyPercent = 100;
       } else if (desired < 20) {
-        // accept 1 instance in an unknown state during rollback
         healthyPercent = 90;
       } else {
         healthyPercent = 95;
@@ -78,7 +92,7 @@ module(AMAZON_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER, [SERV
         },
       };
 
-      $scope.minHealthy = function (percent) {
+      $scope.minHealthy = function (percent: number) {
         return Math.ceil((desired * percent) / 100);
       };
 
@@ -97,7 +111,6 @@ module(AMAZON_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER, [SERV
         }
 
         if (rollbackType === 'PREVIOUS_IMAGE') {
-          // no need to validate when using an explicit image
           return true;
         }
 
@@ -126,7 +139,7 @@ module(AMAZON_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER, [SERV
         $uibModalInstance.dismiss();
       };
 
-      this.label = function (serverGroup) {
+      this.label = function (serverGroup: any) {
         if (!serverGroup) {
           return '';
         }
@@ -138,7 +151,7 @@ module(AMAZON_SERVERGROUP_DETAILS_ROLLBACK_ROLLBACKSERVERGROUP_CONTROLLER, [SERV
         return serverGroup.name + ' (build #' + serverGroup.buildInfo.jenkins.number + ')';
       };
 
-      this.group = function (serverGroup) {
+      this.group = function (serverGroup: any) {
         return serverGroup.isDisabled ? 'Disabled Server Groups' : 'Enabled Server Groups';
       };
     },

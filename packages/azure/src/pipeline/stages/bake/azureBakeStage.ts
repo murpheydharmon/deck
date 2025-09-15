@@ -1,6 +1,5 @@
-'use strict';
-
 import { module } from 'angular';
+import type { IQService, IScope } from 'angular';
 import _ from 'lodash';
 
 import {
@@ -12,6 +11,7 @@ import {
   Registry,
   SETTINGS,
 } from '@spinnaker/core';
+import type { Application } from '@spinnaker/core';
 
 import { AZURE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './bakeExecutionDetails.controller';
 import { AZURE_IMAGE_IMAGE_READER } from '../../../image/image.reader';
@@ -19,6 +19,28 @@ import { AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE } from '.
 
 export const AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE = 'spinnaker.azure.pipeline.stage.bakeStage';
 export const name = AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE; // for backwards compatibility
+
+interface IAzureBakeScope extends IScope {
+  stage: any;
+  application: Application;
+  viewState: {
+    loading: boolean;
+    roscoMode?: boolean;
+  };
+  accounts: string[];
+  regions: string[];
+  baseOsOptions: any[];
+  baseLabelOptions: any[];
+  osTypeOptions: string[];
+  packageTypeOptions: string[];
+  showAdvancedOptions: boolean;
+  managedImagesWasChosen: boolean;
+  defaultImagesWasChosen: boolean;
+  customImagesWasChosen: boolean;
+  managedImageOptions: any[];
+  onChangeManagedImage: () => void;
+}
+
 module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
   AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE,
   AZURE_IMAGE_IMAGE_READER,
@@ -33,7 +55,7 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
       templateUrl: require('./bakeStage.html'),
       executionDetailsUrl: require('./bakeExecutionDetails.html'),
       executionLabelComponent: BakeExecutionLabel,
-      extraLabelLines: (stage) => {
+      extraLabelLines: (stage: any) => {
         return stage.masterStage.context.allPreviouslyBaked || stage.masterStage.context.somePreviouslyBaked ? 1 : 0;
       },
       supportsCustomTimeout: true,
@@ -43,7 +65,7 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
         {
           type: 'upstreamVersionProvided',
           checkParentTriggers: true,
-          getMessage: (labels) =>
+          getMessage: (labels: string[]) =>
             'Bake stages should always have a stage or trigger preceding them that provides version information: ' +
             '<ul>' +
             labels.map((label) => `<li>${label}</li>`).join('') +
@@ -52,14 +74,14 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
         },
       ],
       restartable: true,
-    });
+    } as any);
   })
   .controller('azureBakeStageCtrl', [
     '$scope',
     '$q',
     'azureImageReader',
     '$uibModal',
-    function ($scope, $q, azureImageReader, $uibModal) {
+    function ($scope: IAzureBakeScope, $q: IQService, azureImageReader: any, $uibModal: any) {
       $scope.stage.extendedAttributes = $scope.stage.extendedAttributes || {};
       $scope.stage.regions = $scope.stage.regions || [];
 
@@ -114,7 +136,6 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
 
       function stageUpdated() {
         deleteEmptyProperties();
-        // Since the selector computes using stage as an input, it needs to be able to recompute roscoMode on updates
         if (typeof SETTINGS.feature.roscoSelector === 'function') {
           $scope.viewState.roscoMode = SETTINGS.feature.roscoSelector($scope.stage);
         }
@@ -140,11 +161,11 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
       function setManagedImages() {
         azureImageReader
           .findImages({ provider: 'azure', managedImages: true, account: $scope.stage.account })
-          .then(function (images) {
-            let managedImageOptions = [];
-            for (let i in images) {
-              let image = images[i];
-              let newImage = {
+          .then(function (images: any[]) {
+            const managedImageOptions: any[] = [];
+            for (const i in images) {
+              const image = images[i];
+              const newImage = {
                 id: image.imageName,
                 osType: image.ostype,
                 name: image.imageName,
@@ -158,7 +179,7 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
 
       function setRegions() {
         AccountService.getRegionsForAccount($scope.stage.account)
-          .then(function (regions) {
+          .then(function (regions: any[]) {
             $scope.regions = regions.map((r) => r.name);
           })
           .catch(() => {});
@@ -182,13 +203,13 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
               },
             },
           })
-          .result.then(function (extendedAttribute) {
+          .result.then(function (extendedAttribute: any) {
             $scope.stage.extendedAttributes[extendedAttribute.key] = extendedAttribute.value;
           })
           .catch(() => {});
       };
 
-      this.removeExtendedAttribute = function (key) {
+      this.removeExtendedAttribute = function (key: string) {
         delete $scope.stage.extendedAttributes[key];
       };
 
@@ -265,7 +286,7 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
         $scope.stage.osType = selectedManagedImage.osType.toLowerCase();
       };
 
-      this.onChangeOsType = function (e) {
+      this.onChangeOsType = function () {
         $scope.stage.packageType = null;
       };
 

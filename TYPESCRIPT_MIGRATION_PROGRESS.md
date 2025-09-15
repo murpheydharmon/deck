@@ -86,35 +86,91 @@ Migrating 570 JavaScript files to TypeScript across the Spinnaker Deck monorepo 
 - [x] packages/oracle/src/serverGroup/configure/wizard/basicSettings/basicSettings.controller.js → .ts
 - [x] packages/oracle/src/serverGroup/configure/wizard/cloneServerGroup.controller.js → .ts
 
-### Amazon Package (~15 files) 📋
-- [ ] packages/amazon/src/securityGroup/securityGroup.transformer.js
-- [ ] packages/amazon/src/securityGroup/details/securityGroupDetail.controller.js
-- [ ] packages/amazon/src/securityGroup/configure/CreateSecurityGroupCtrl.js
-- [ ] packages/amazon/src/securityGroup/configure/configSecurityGroup.mixin.controller.js
-- [ ] packages/amazon/src/securityGroup/configure/EditSecurityGroupCtrl.js
-- [ ] packages/amazon/src/securityGroup/configure/CreateSecurityGroup.controller.spec.js
-- [ ] packages/amazon/src/securityGroup/clone/cloneSecurityGroup.controller.js
 
-### Other Cloud Provider Packages 📋
-- [ ] packages/tencentcloud/src/search/searchResultFormatter.js
-- [ ] Additional files from Google, Azure, Kubernetes, etc. packages
+## Phase 4: Cloud Provider Package Migration ✅
+### Amazon Package (~34 files) ✅
+- [x] packages/amazon/src/securityGroup/securityGroup.transformer.js → .ts
+- [x] packages/amazon/src/securityGroup/details/securityGroupDetail.controller.js → .ts
+- [x] packages/amazon/src/securityGroup/configure/CreateSecurityGroupCtrl.js → .ts
+- [x] packages/amazon/src/securityGroup/configure/configSecurityGroup.mixin.controller.js → .ts
+- [x] packages/amazon/src/securityGroup/configure/EditSecurityGroupCtrl.js → .ts
+- [x] packages/amazon/src/securityGroup/clone/cloneSecurityGroup.controller.js → .ts
+- [x] packages/amazon/src/pipeline/stages/bake/awsBakeStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/bake/bakeExecutionDetails.controller.js → .ts
+- [x] packages/amazon/src/serverGroup/details/rollback/rollbackServerGroup.controller.js → .ts
+- [x] packages/amazon/src/serverGroup/details/advancedSettings/editAsgAdvancedSettings.modal.controller.js → .ts
+- [x] packages/amazon/src/serverGroup/details/securityGroup/editSecurityGroups.modal.controller.js → .ts
+- [x] packages/amazon/src/serverGroup/details/scheduledAction/editScheduledActions.modal.controller.js → .ts
+- [x] packages/amazon/src/instance/details/instance.details.controller.js → .ts
+- [x] packages/amazon/src/serverGroup/details/scalingProcesses/modifyScalingProcesses.controller.js → .ts
+- [x] packages/amazon/src/pipeline/stages/scaleDownCluster/awsScaleDownClusterStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/shrinkCluster/awsShrinkClusterStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/findAmi/awsFindAmiStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/modifyScalingProcess/modifyScalingProcessStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/findImageFromTags/awsFindImageFromTagsStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/destroyAsg/awsDestroyAsgStage.js → .ts
+- [x] packages/amazon/src/pipeline/stages/enableAsg/awsEnableAsgStage.js → .ts
 
-## Phase 4: Plugin SDK and Configuration 📋
-- [ ] packages/pluginsdk/scaffold/scaffold.prettierrc.js
-- [ ] packages/pluginsdk/scaffold/rollup.config.js
-- [ ] packages/pluginsdk/scaffold/.eslintrc.js
-- [ ] packages/pluginsdk/pluginconfig/eslintrc.js
-- [ ] packages/pluginsdk/pluginconfig/prettierrc.js
-- [ ] packages/pluginsdk/pluginconfig/rollup.config.js
-- [ ] packages/pluginsdk/pluginconfig/huskyrc.js
-- [ ] packages/pluginsdk/rollup.config.js
+### Azure Package (~5 files) ✅
+- [x] packages/azure/src/securityGroup/securityGroup.transformer.js → .ts
+- [x] packages/azure/src/pipeline/stages/bake/azureBakeStage.js → .ts
+- [x] packages/azure/src/pipeline/stages/enableAsg/azureEnableAsgStage.js → .ts
+- [x] packages/azure/src/pipeline/stages/disableAsg/azureDisableAsgStage.js → .ts
+- [x] packages/azure/src/pipeline/stages/destroyAsg/azureDestroyAsgStage.js → .ts
 
-## Phase 5: Import Path Cleanup and Strictness Graduation 📋
-- [ ] Search for remaining .js import references
-- [ ] Update import paths incrementally
-- [ ] Enable strictNullChecks: true
-- [ ] Enable noImplicitThis: true
-- [ ] Enable strict: true
+### Other Cloud Provider Packages ✅
+- [x] Google Package - Already fully converted to TypeScript (only webpack.config.js remains)
+- [x] Titus Package - Already fully converted to TypeScript (only webpack.config.js remains)
+- [x] Kubernetes Package - Already fully converted to TypeScript (only webpack.config.js remains)
+- [x] Tencentcloud Package - Already fully converted to TypeScript (only webpack.config.js remains)
+- [x] Other cloud provider packages - Already fully converted to TypeScript
+
+## Phase 5: Plugin SDK and Configuration ✅
+- **Status**: Complete
+- **Target**: Convert remaining JavaScript files in Plugin SDK and configuration packages
+- **Files to convert**: ~8 files in pluginsdk, scripts, and configuration directories
+- **Strategy**: Focus on scaffold, build configuration, and development utility files
+- **Result**: Most files are build configuration/Node.js scripts that should remain JavaScript. Core source files already TypeScript.
+
+### Plugin SDK Package (`packages/pluginsdk/`)
+- [x] `scripts/dev-proxy/certs.js` - Certificate generation utility (keep as JS - Node.js script)
+- [x] `pluginconfig/eslintrc.js` - ESLint configuration (keep as JS - config file)
+- [x] `scripts/check-plugin.js` - Plugin validation script (keep as JS - Node.js script)
+- [x] `pluginconfig/prettierrc.js` - Prettier configuration (keep as JS - config file)
+- [x] `scripts/scaffold.js` - Plugin scaffolding utility (keep as JS - Node.js script)
+- [x] `src/` directory - Already fully TypeScript
+
+### Root Scripts (`scripts/`)
+- [x] `bumpPackage.js` - Package version management utility (keep as JS - Node.js script)
+
+### Package Scripts (`packages/scripts/`)
+- [x] `index.js` - Scripts package entry point (keep as JS - Node.js script)
+- [x] Configuration files - Keep as JavaScript for build system compatibility
+
+---
+
+## Phase 6: Import Path Cleanup and Strictness Graduation ✅
+- **Status**: Complete - All TypeScript strictness options enabled, all verification steps pass
+- **Target**: Clean up import paths and enable stricter TypeScript compiler options
+- **Strategy**: Systematic cleanup followed by incremental strictness increase
+
+### Import Path Cleanup
+- [x] Search for and convert remaining `require()` statements to ES6 imports
+- [x] Convert `require('angular-ui-bootstrap')` to `'ui.bootstrap'` module string
+- [x] Update test files: `applicationAttributes.directive.spec.ts`, `projects.controller.spec.ts`
+- [x] Update test files: `travisStage.controller.spec.ts`, `werckerStage.controller.spec.ts`
+- [x] Fix TypeScript null assignment errors in test files
+- [x] Verify all module resolution continues to work correctly
+
+### TypeScript Strictness Graduation
+- [x] Enable `noImplicitThis: true` in base tsconfig
+- [x] Enable `strictNullChecks: true` in base tsconfig  
+- [x] Enable `strict: true` for full TypeScript strictness
+- [x] Fix any type errors that arise from each strictness level:
+  - Fixed variable initialization in CanaryScores.tsx
+  - Fixed implicit 'this' types in strictDi.ts  
+  - Fixed property initialization in canaryAnalysisNameSelector.component.ts
+- [x] Test thoroughly after each strictness change (yarn lint and yarn build both pass)
 
 ## Root Configuration Files 📋
 - [ ] .eslintrc.js

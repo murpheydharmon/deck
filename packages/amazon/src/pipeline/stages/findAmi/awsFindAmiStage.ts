@@ -1,13 +1,30 @@
-'use strict';
-
 import * as angular from 'angular';
+import { module } from 'angular';
+import type { IScope } from 'angular';
 
+import type { Application } from '@spinnaker/core';
 import { AccountService, Registry } from '@spinnaker/core';
 
 export const AMAZON_PIPELINE_STAGES_FINDAMI_AWSFINDAMISTAGE = 'spinnaker.amazon.pipeline.stage.findAmiStage';
 export const name = AMAZON_PIPELINE_STAGES_FINDAMI_AWSFINDAMISTAGE; // for backwards compatibility
-angular
-  .module(AMAZON_PIPELINE_STAGES_FINDAMI_AWSFINDAMISTAGE, [])
+
+interface IAwsFindAmiScope extends IScope {
+  stage: any;
+  application: Application;
+  accounts: any[];
+  state: {
+    accounts: boolean;
+    regionsLoaded: boolean;
+  };
+  selectionStrategies: Array<{
+    label: string;
+    val: string;
+    description: string;
+  }>;
+  accountUpdated: () => void;
+}
+
+module(AMAZON_PIPELINE_STAGES_FINDAMI_AWSFINDAMISTAGE, [])
   .config(function () {
     Registry.pipeline.registerStage({
       provides: 'findImage',
@@ -20,11 +37,11 @@ angular
         { type: 'requiredField', fieldName: 'regions' },
         { type: 'requiredField', fieldName: 'credentials' },
       ],
-    });
+    } as any);
   })
   .controller('awsFindAmiStageCtrl', [
     '$scope',
-    function ($scope) {
+    function ($scope: IAwsFindAmiScope) {
       const stage = $scope.stage;
 
       $scope.state = {
@@ -32,7 +49,7 @@ angular
         regionsLoaded: false,
       };
 
-      AccountService.listAccounts('aws').then(function (accounts) {
+      AccountService.listAccounts('aws').then(function (accounts: any[]) {
         $scope.accounts = accounts;
         $scope.state.accounts = true;
       });

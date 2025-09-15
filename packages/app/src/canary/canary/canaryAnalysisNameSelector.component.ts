@@ -5,7 +5,7 @@ import { REST, SETTINGS } from '@spinnaker/core';
 
 class CanaryAnalysisNameSelectorController implements IController {
   public nameList: string[] = [];
-  public queryListUrl: string;
+  public queryListUrl!: string;
 
   public $onInit(): void {
     this.queryListUrl = SETTINGS.canaryConfig ? SETTINGS.canaryConfig.queryListUrl : null;

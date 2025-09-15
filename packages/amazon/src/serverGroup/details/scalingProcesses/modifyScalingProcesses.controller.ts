@@ -1,22 +1,37 @@
-'use strict';
-
 import * as angular from 'angular';
+import { module } from 'angular';
+import type { IScope } from 'angular';
 import _ from 'lodash';
 
+import type { Application } from '@spinnaker/core';
 import { TaskExecutor, TaskMonitor } from '@spinnaker/core';
 
 export const AMAZON_SERVERGROUP_DETAILS_SCALINGPROCESSES_MODIFYSCALINGPROCESSES_CONTROLLER =
   'spinnaker.amazon.serverGroup.details.autoscaling.process.controller';
 export const name = AMAZON_SERVERGROUP_DETAILS_SCALINGPROCESSES_MODIFYSCALINGPROCESSES_CONTROLLER; // for backwards compatibility
-angular
-  .module(AMAZON_SERVERGROUP_DETAILS_SCALINGPROCESSES_MODIFYSCALINGPROCESSES_CONTROLLER, [])
-  .controller('ModifyScalingProcessesCtrl', [
+
+interface IModifyScalingProcessesScope extends IScope {
+  command: any;
+  serverGroup: any;
+  verification: any;
+  taskMonitor: TaskMonitor;
+}
+
+module(AMAZON_SERVERGROUP_DETAILS_SCALINGPROCESSES_MODIFYSCALINGPROCESSES_CONTROLLER, []).controller(
+  'ModifyScalingProcessesCtrl',
+  [
     '$scope',
     '$uibModalInstance',
     'application',
     'serverGroup',
     'processes',
-    function ($scope, $uibModalInstance, application, serverGroup, processes) {
+    function (
+      $scope: IModifyScalingProcessesScope,
+      $uibModalInstance: any,
+      application: Application,
+      serverGroup: any,
+      processes: any,
+    ) {
       $scope.command = angular.copy(processes);
       $scope.serverGroup = serverGroup;
       $scope.verification = {};
@@ -53,7 +68,7 @@ angular
         const toEnable = _.intersection(currentlySuspended, enabledSelections);
         const toSuspend = _.intersection(currentlyEnabled, suspendedSelections);
 
-        const job = [];
+        const job: any[] = [];
         if (toEnable.length) {
           job.push({
             type: 'modifyScalingProcess',
@@ -92,4 +107,5 @@ angular
 
       this.cancel = $uibModalInstance.dismiss;
     },
-  ]);
+  ],
+);

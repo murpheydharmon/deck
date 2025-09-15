@@ -1,11 +1,23 @@
-'use strict';
-
 import { module } from 'angular';
+import type { IScope } from 'angular';
 
+import type { Application } from '@spinnaker/core';
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
 export const AZURE_PIPELINE_STAGES_DISABLEASG_AZUREDISABLEASGSTAGE = 'spinnaker.azure.pipeline.stage.disableAsgStage';
 export const name = AZURE_PIPELINE_STAGES_DISABLEASG_AZUREDISABLEASGSTAGE; // for backwards compatibility
+
+interface IAzureDisableAsgScope extends IScope {
+  stage: any;
+  application: Application;
+  accounts: any[];
+  state: {
+    accounts: boolean;
+    regionsLoaded: boolean;
+  };
+  targets: any[];
+}
+
 module(AZURE_PIPELINE_STAGES_DISABLEASG_AZUREDISABLEASGSTAGE, [])
   .config(function () {
     Registry.pipeline.registerStage({
@@ -25,11 +37,11 @@ module(AZURE_PIPELINE_STAGES_DISABLEASG_AZUREDISABLEASGSTAGE, [])
         { type: 'requiredField', fieldName: 'regions' },
         { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
       ],
-    });
+    } as any);
   })
   .controller('azureDisableAsgStageCtrl', [
     '$scope',
-    function ($scope) {
+    function ($scope: IAzureDisableAsgScope) {
       const stage = $scope.stage;
 
       $scope.state = {
@@ -37,7 +49,7 @@ module(AZURE_PIPELINE_STAGES_DISABLEASG_AZUREDISABLEASGSTAGE, [])
         regionsLoaded: false,
       };
 
-      AccountService.listAccounts('azure').then(function (accounts) {
+      AccountService.listAccounts('azure').then(function (accounts: any[]) {
         $scope.accounts = accounts;
         $scope.state.accounts = true;
       });

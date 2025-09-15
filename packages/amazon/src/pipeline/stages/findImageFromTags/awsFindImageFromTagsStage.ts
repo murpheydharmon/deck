@@ -1,12 +1,17 @@
-'use strict';
-
 import { module } from 'angular';
+import type { IScope } from 'angular';
 
 import { BakeryReader, Registry } from '@spinnaker/core';
 
 export const AMAZON_PIPELINE_STAGES_FINDIMAGEFROMTAGS_AWSFINDIMAGEFROMTAGSSTAGE =
   'spinnaker.amazon.pipeline.stage.findImageFromTagsStage';
 export const name = AMAZON_PIPELINE_STAGES_FINDIMAGEFROMTAGS_AWSFINDIMAGEFROMTAGSSTAGE; // for backwards compatibility
+
+interface IAwsFindImageFromTagsScope extends IScope {
+  stage: any;
+  regions: any[];
+}
+
 module(AMAZON_PIPELINE_STAGES_FINDIMAGEFROMTAGS_AWSFINDIMAGEFROMTAGSSTAGE, [])
   .config(function () {
     Registry.pipeline.registerStage({
@@ -20,16 +25,16 @@ module(AMAZON_PIPELINE_STAGES_FINDIMAGEFROMTAGS_AWSFINDIMAGEFROMTAGSSTAGE, [])
         { type: 'requiredField', fieldName: 'regions' },
         { type: 'requiredField', fieldName: 'tags' },
       ],
-    });
+    } as any);
   })
   .controller('awsFindImageFromTagsStageCtrl', [
     '$scope',
-    function ($scope) {
+    function ($scope: IAwsFindImageFromTagsScope) {
       $scope.stage.tags = $scope.stage.tags || {};
       $scope.stage.regions = $scope.stage.regions || [];
       $scope.stage.cloudProvider = $scope.stage.cloudProvider || 'aws';
 
-      BakeryReader.getRegions('aws').then(function (regions) {
+      BakeryReader.getRegions('aws').then(function (regions: any[]) {
         $scope.regions = regions;
       });
     },

@@ -1,13 +1,22 @@
-'use strict';
-
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import * as angular from 'angular';
+import type { IScope } from 'angular';
 import _ from 'lodash';
 
+import type { Application } from '@spinnaker/core';
 import { FirewallLabels, SecurityGroupWriter, TaskMonitor } from '@spinnaker/core';
 
 export const AMAZON_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL = 'spinnaker.amazon.securityGroup.edit.controller';
 export const name = AMAZON_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL; // for backwards compatibility
+
+interface IAWSEditSecurityGroupScope extends IScope {
+  self: any;
+  pages: any;
+  securityGroup: any;
+  state: any;
+  taskMonitor: TaskMonitor;
+}
+
 angular
   .module(AMAZON_SECURITYGROUP_CONFIGURE_EDITSECURITYGROUPCTRL, [UIROUTER_ANGULARJS])
   .controller('awsEditSecurityGroupCtrl', [
@@ -17,7 +26,14 @@ angular
     'application',
     'securityGroup',
     '$controller',
-    function ($scope, $uibModalInstance, $state, application, securityGroup, $controller) {
+    function (
+      $scope: IAWSEditSecurityGroupScope,
+      $uibModalInstance: any,
+      $state: any,
+      application: Application,
+      securityGroup: any,
+      $controller: any,
+    ) {
       $scope.self = $scope;
       $scope.pages = {
         ingress: require('./createSecurityGroupIngress.html'),
@@ -52,9 +68,9 @@ angular
       });
 
       securityGroup.securityGroupIngress = _.chain(securityGroup.inboundRules)
-        .filter((rule) => rule.securityGroup)
-        .map((rule) =>
-          rule.portRanges.map((portRange) => {
+        .filter((rule: any) => rule.securityGroup)
+        .map((rule: any) =>
+          rule.portRanges.map((portRange: any) => {
             const vpcId = rule.securityGroup.vpcId === securityGroup.vpcId ? null : rule.securityGroup.vpcId;
             return {
               accountName: rule.securityGroup.accountName || rule.securityGroup.accountId,
@@ -73,11 +89,11 @@ angular
         .value();
 
       securityGroup.ipIngress = _.chain(securityGroup.inboundRules)
-        .filter(function (rule) {
+        .filter(function (rule: any) {
           return rule.range;
         })
-        .map(function (rule) {
-          return rule.portRanges.map(function (portRange) {
+        .map(function (rule: any) {
+          return rule.portRanges.map(function (portRange: any) {
             return {
               cidr: rule.range.ip + rule.range.cidr,
               type: rule.protocol,

@@ -1,13 +1,17 @@
-'use strict';
-
 import { module } from 'angular';
+import type { IScope } from 'angular';
 import _ from 'lodash';
 
-import { FirewallLabels, SECURITY_GROUP_READER, SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
+import type { Application } from '@spinnaker/core';
+import { FirewallLabels, SECURITY_GROUP_READER, SERVER_GROUP_WRITER } from '@spinnaker/core';
+import { TaskMonitor } from '@spinnaker/core';
 
 export const AMAZON_SERVERGROUP_DETAILS_SECURITYGROUP_EDITSECURITYGROUPS_MODAL_CONTROLLER =
   'spinnaker.amazon.serverGroup.details.securityGroup.editSecurityGroups.modal.controller';
 export const name = AMAZON_SERVERGROUP_DETAILS_SECURITYGROUP_EDITSECURITYGROUPS_MODAL_CONTROLLER; // for backwards compatibility
+
+interface IEditSecurityGroupsScope extends IScope {}
+
 module(AMAZON_SERVERGROUP_DETAILS_SECURITYGROUP_EDITSECURITYGROUPS_MODAL_CONTROLLER, [
   SERVER_GROUP_WRITER,
   SECURITY_GROUP_READER,
@@ -20,16 +24,16 @@ module(AMAZON_SERVERGROUP_DETAILS_SECURITYGROUP_EDITSECURITYGROUPS_MODAL_CONTROL
   'serverGroup',
   'securityGroups',
   function (
-    $scope,
-    $uibModalInstance,
-    serverGroupWriter,
-    securityGroupReader,
-    application,
-    serverGroup,
-    securityGroups,
+    $scope: IEditSecurityGroupsScope,
+    $uibModalInstance: any,
+    serverGroupWriter: any,
+    securityGroupReader: any,
+    application: Application,
+    serverGroup: any,
+    securityGroups: any,
   ) {
     this.command = {
-      securityGroups: (securityGroups || []).slice(0).sort((a, b) => a.name.localeCompare(b.name)),
+      securityGroups: (securityGroups || []).slice(0).sort((a: any, b: any) => a.name.localeCompare(b.name)),
     };
 
     this.state = {
@@ -48,17 +52,17 @@ module(AMAZON_SERVERGROUP_DETAILS_SECURITYGROUP_EDITSECURITYGROUPS_MODAL_CONTROL
 
     this.isValid = () => this.state.verification.verified;
 
-    securityGroupReader.getAllSecurityGroups().then((allGroups) => {
+    securityGroupReader.getAllSecurityGroups().then((allGroups: any) => {
       const account = serverGroup.account;
       const region = serverGroup.region;
       const vpcId = serverGroup.vpcId;
       this.availableSecurityGroups = _.get(allGroups, [account, 'aws', region].join('.'), [])
-        .filter((group) => group.vpcId === vpcId)
-        .sort((a, b) => {
-          if (this.command.securityGroups.some((g) => g.id === a.id)) {
+        .filter((group: any) => group.vpcId === vpcId)
+        .sort((a: any, b: any) => {
+          if (this.command.securityGroups.some((g: any) => g.id === a.id)) {
             return -1;
           }
-          if (this.command.securityGroups.some((g) => g.id === b.id)) {
+          if (this.command.securityGroups.some((g: any) => g.id === b.id)) {
             return 1;
           }
           return a.name.localeCompare(b.name);

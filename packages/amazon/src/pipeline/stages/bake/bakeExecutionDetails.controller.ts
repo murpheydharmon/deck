@@ -1,7 +1,6 @@
-'use strict';
-
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import { module } from 'angular';
+import type { IScope } from 'angular';
 import { get } from 'lodash';
 
 import { SETTINGS } from '@spinnaker/core';
@@ -9,6 +8,17 @@ import { SETTINGS } from '@spinnaker/core';
 export const AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER =
   'spinnaker.amazon.pipeline.stage.bake.executionDetails.controller';
 export const name = AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER; // for backwards compatibility
+
+interface IAWSBakeExecutionDetailsScope extends IScope {
+  configSections: string[];
+  detailsSection: string;
+  provider: string;
+  roscoMode: boolean;
+  stage: any;
+  bakeryDetailUrl: any;
+  bakeFailedNoError: boolean;
+}
+
 module(AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER, [UIROUTER_ANGULARJS]).controller(
   'awsBakeExecutionDetailsCtrl',
   [
@@ -16,7 +26,12 @@ module(AMAZON_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER, [UIROUTER_AN
     '$stateParams',
     'executionDetailsSectionService',
     '$interpolate',
-    function ($scope, $stateParams, executionDetailsSectionService, $interpolate) {
+    function (
+      $scope: IAWSBakeExecutionDetailsScope,
+      $stateParams: any,
+      executionDetailsSectionService: any,
+      $interpolate: any,
+    ) {
       $scope.configSections = ['bakeConfig', 'taskStatus'];
 
       const initialized = () => {

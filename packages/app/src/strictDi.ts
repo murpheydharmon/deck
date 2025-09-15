@@ -46,7 +46,7 @@ function assertAnnotatedFunction(injectedFn: any, message: string) {
 }
 
 function invokeAnnotatedFunction(name: string, angularModuleFn: Function, argumentIdx: number) {
-  return function () {
+  return function (this: any) {
     assertAnnotatedFunction(arguments[argumentIdx], `angular.module().${name}()`);
     return angularModuleFn.apply(this, arguments);
   };
@@ -83,7 +83,7 @@ const angularJSModuleStrictDiHandler: ProxyHandler<any> = {
       case 'service':
         return invokeAnnotatedFunction(fnName, angularModuleFn, 1);
       case 'component':
-        return function () {
+        return function (this: any) {
           const [name, componentObject] = arguments;
 
           if (componentObject.controller && typeof componentObject.controller !== 'string') {
@@ -96,7 +96,7 @@ const angularJSModuleStrictDiHandler: ProxyHandler<any> = {
           return angularModuleFn.apply(this, arguments);
         };
       case 'directive':
-        return function () {
+        return function (this: any) {
           const [name, ddoFactory, ...rest] = arguments;
 
           assertAnnotatedFunction(ddoFactory, `angular.module().directive('${name}', ddoFactory)`);
@@ -117,8 +117,8 @@ const angularJSModuleStrictDiHandler: ProxyHandler<any> = {
 
 const allowlistedModules = ['ngMock'];
 const realModule = angular.module;
-(angular as any).module = function module() {
-  const angularModule = realModule.apply(this, arguments);
-  const isAllowlisted = allowlistedModules.includes(arguments[0]);
+(angular as any).module = function module(...args: any[]) {
+  const angularModule = realModule.apply(this, args as any);
+  const isAllowlisted = allowlistedModules.includes(args[0]);
   return isAllowlisted ? angularModule : new Proxy(angularModule, angularJSModuleStrictDiHandler);
 };

@@ -9,7 +9,7 @@ import { TRAVIS_STAGE, TravisStage } from './travisStage';
 describe('Travis Stage Controller', () => {
   let $scope: IScope, $q: IQService, $ctrl: IControllerService;
 
-  beforeEach(mock.module(TRAVIS_STAGE, require('angular-ui-bootstrap')));
+  beforeEach(mock.module(TRAVIS_STAGE, 'ui.bootstrap'));
 
   beforeEach(
     mock.inject(($controller: IControllerService, $rootScope: IRootScopeService, _$q_: IQService) => {
@@ -120,7 +120,7 @@ describe('Travis Stage Controller', () => {
       const params: IParameterDefinitionList[] = [
         { name: 'overridden', defaultValue: 'z' },
         { name: 'notSet', defaultValue: 'a' },
-        { name: 'noDefault', defaultValue: null },
+        { name: 'noDefault', defaultValue: '' },
       ];
       const jobConfig = {
         parameterDefinitionList: params,

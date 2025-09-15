@@ -1,12 +1,12 @@
-'use strict';
+import { module } from 'angular';
 
 describe('Controller: Config', function () {
-  var $controller;
-  var configController;
-  var $uibModal;
-  var application;
+  let $controller;
+  let configController;
+  let $uibModal;
+  let application;
 
-  beforeEach(window.module(require('./applicationAttributes.directive').name, require('angular-ui-bootstrap')));
+  beforeEach(window.module(require('./applicationAttributes.directive').name, 'ui.bootstrap'));
 
   beforeEach(
     window.inject(function (_$controller_, _$uibModal_) {
@@ -33,7 +33,7 @@ describe('Controller: Config', function () {
     });
 
     it('should copy attributes when edit application is successful', function () {
-      var newAttributes = { foo: 'bar' };
+      const newAttributes = { foo: 'bar' };
       const modalStub = {
         result: {
           then: function (method) {

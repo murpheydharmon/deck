@@ -1,10 +1,10 @@
-'use strict';
-
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import { module } from 'angular';
+import type { IScope } from 'angular';
 import _ from 'lodash';
 import { Subject } from 'rxjs';
 
+import type { Application } from '@spinnaker/core';
 import {
   AccountService,
   filterObjectValues,
@@ -22,6 +22,36 @@ import { VpcReader } from '../../vpc/VpcReader';
 export const AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER =
   'spinnaker.amazon.securityGroup.baseConfig.controller';
 export const name = AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER; // for backwards compatibility
+
+interface IAWSConfigSecurityGroupScope extends IScope {
+  application: Application;
+  securityGroup: any;
+  isNew: boolean;
+  state: any;
+  firewallLabel: string;
+  pages: any;
+  allVpcs: any[];
+  availableVpcs: any[];
+  existingSecurityGroupNames: string[];
+  infiniteScroll: any;
+  self: any;
+  customComponentIsvalid: boolean;
+  wizard: any;
+  hideClassic: boolean;
+  accounts: any[];
+  allAccounts: any[];
+  regions: string[];
+  activeVpcs: any[];
+  deprecatedVpcs: any[];
+  vpcs: any[];
+  availableSecurityGroups: string[];
+  allSecurityGroups: any;
+  allSecurityGroupsUpdated: Subject<any>;
+  coordinatesChanged: Subject<any>;
+  namePreview: string;
+  taskMonitor: TaskMonitor;
+}
+
 module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
   UIROUTER_ANGULARJS,
   SECURITY_GROUP_READER,
@@ -33,8 +63,16 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
   'securityGroup',
   'securityGroupReader',
   'cacheInitializer',
-  function ($scope, $state, $uibModalInstance, application, securityGroup, securityGroupReader, cacheInitializer) {
-    let allSecurityGroups;
+  function (
+    $scope: IAWSConfigSecurityGroupScope,
+    $state: any,
+    $uibModalInstance: any,
+    application: Application,
+    securityGroup: any,
+    securityGroupReader: any,
+    cacheInitializer: any,
+  ) {
+    let allSecurityGroups: any;
     const ctrl = this;
     $scope.self = $scope;
     $scope.application = application;
@@ -62,7 +100,6 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
     const getAccount = () => $scope.securityGroup.accountName || $scope.securityGroup.credentials;
 
     function onApplicationRefresh() {
-      // If the user has already closed the modal, do not navigate to the new details view
       if ($scope.$$destroyed) {
         return;
       }
@@ -96,8 +133,8 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
     $scope.securityGroup = securityGroup;
 
     ctrl.initializeAccounts = () => {
-      return AccountService.listAllAccounts('aws').then(function (accounts) {
-        $scope.accounts = accounts.filter((a) => a.authorized !== false);
+      return AccountService.listAllAccounts('aws').then(function (accounts: any) {
+        $scope.accounts = accounts.filter((a: any) => a.authorized !== false);
         $scope.allAccounts = accounts;
         ctrl.accountUpdated();
       });
@@ -116,10 +153,9 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
 
     ctrl.accountUpdated = function () {
       const securityGroup = $scope.securityGroup;
-      // sigh.
       securityGroup.account = securityGroup.accountId = securityGroup.accountName = securityGroup.credentials;
-      AccountService.getRegionsForAccount(getAccount()).then((regions) => {
-        $scope.regions = regions.map((region) => region.name);
+      AccountService.getRegionsForAccount(getAccount()).then((regions: any) => {
+        $scope.regions = regions.map((region: any) => region.name);
         clearSecurityGroups();
         ctrl.regionUpdated();
         if ($scope.state.isNew) {
@@ -131,30 +167,30 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
     ctrl.regionUpdated = function () {
       const account = getAccount();
       const regions = $scope.securityGroup.regions || [];
-      VpcReader.listVpcs().then(function (vpcs) {
+      VpcReader.listVpcs().then(function (vpcs: any) {
         const vpcsByName = _.groupBy(
-          vpcs.filter((vpc) => vpc.account === account),
+          vpcs.filter((vpc: any) => vpc.account === account),
           'label',
         );
         $scope.allVpcs = vpcs;
-        const available = [];
-        _.forOwn(vpcsByName, function (vpcsToTest, label) {
-          const foundInAllRegions = regions.every((region) => {
-            return vpcsToTest.some((test) => test.region === region && test.account === account);
+        const available: any[] = [];
+        _.forOwn(vpcsByName, function (vpcsToTest: any, label: string) {
+          const foundInAllRegions = regions.every((region: string) => {
+            return vpcsToTest.some((test: any) => test.region === region && test.account === account);
           });
           if (foundInAllRegions) {
             available.push({
-              ids: vpcsToTest.filter((t) => regions.includes(t.region)).map((vpc) => vpc.id),
+              ids: vpcsToTest.filter((t: any) => regions.includes(t.region)).map((vpc: any) => vpc.id),
               label: label,
               deprecated: vpcsToTest[0].deprecated,
             });
           }
         });
 
-        $scope.activeVpcs = available.filter(function (vpc) {
+        $scope.activeVpcs = available.filter(function (vpc: any) {
           return !vpc.deprecated;
         });
-        $scope.deprecatedVpcs = available.filter(function (vpc) {
+        $scope.deprecatedVpcs = available.filter(function (vpc: any) {
           return vpc.deprecated;
         });
         $scope.vpcs = available;
@@ -164,7 +200,7 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
       });
     };
 
-    this.updateVpcId = (available) => {
+    this.updateVpcId = (available: any) => {
       const lockoutDate = AWSProviderSettings.classicLaunchLockout;
       if (!securityGroup.id && lockoutDate) {
         const createTs = Number(_.get(application, 'attributes.createTs', 0));
@@ -173,7 +209,7 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
           if (!securityGroup.vpcId && available.length) {
             let defaultMatch;
             if (AWSProviderSettings.defaults.vpc) {
-              const match = available.find((vpc) => vpc.label === AWSProviderSettings.defaults.vpc);
+              const match = available.find((vpc: any) => vpc.label === AWSProviderSettings.defaults.vpc);
               if (match) {
                 defaultMatch = match.ids[0];
               }
@@ -184,12 +220,11 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
         }
       }
 
-      // When cloning a security group, if a user chooses a different account to clone to, but wants to retain the same VPC in this new account, it was not possible.
-      // We matched the vpc ids from one account to another but they are never the same. In order to ensure that users still retain their VPC choice, irrespective of the account, we switched to using vpc names instead of vpc ids
-      const selectedVpc = $scope.allVpcs.find((vpc) => vpc.id === $scope.securityGroup.vpcId);
-      const match = (available || []).find((vpc) => selectedVpc && selectedVpc.label === vpc.label);
+      const selectedVpc = $scope.allVpcs.find((vpc: any) => vpc.id === $scope.securityGroup.vpcId);
+      const match = (available || []).find((vpc: any) => selectedVpc && selectedVpc.label === vpc.label);
       const defaultVpc =
-        (available || []).find((vpc) => AWSProviderSettings.defaults.vpc === vpc.label) || ($scope.activeVpcs || [])[0];
+        (available || []).find((vpc: any) => AWSProviderSettings.defaults.vpc === vpc.label) ||
+        ($scope.activeVpcs || [])[0];
       $scope.securityGroup.vpcId = (match && match.ids[0]) || (defaultVpc && defaultVpc.ids[0]);
       this.vpcUpdated();
     };
@@ -209,10 +244,10 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
       const vpcId = $scope.securityGroup.vpcId || null;
       const account = getAccount();
       const regions = $scope.securityGroup.regions || [];
-      let existingSecurityGroupNames = [];
-      let availableSecurityGroups = [];
+      let existingSecurityGroupNames: string[] = [];
+      let availableSecurityGroups: string[] = [];
 
-      regions.forEach(function (region) {
+      regions.forEach(function (region: string) {
         let regionalVpcId = null;
         if (vpcId) {
           const baseVpc = _.find($scope.allVpcs, { id: vpcId });
@@ -220,13 +255,13 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
         }
 
         const regionalGroupNames = _.get(allSecurityGroups, [account, 'aws', region].join('.'), [])
-          .filter((sg) => sg.vpcId === regionalVpcId)
-          .map((sg) => sg.name);
+          .filter((sg: any) => sg.vpcId === regionalVpcId)
+          .map((sg: any) => sg.name);
 
         existingSecurityGroupNames = _.uniq(existingSecurityGroupNames.concat(regionalGroupNames));
 
         if (!availableSecurityGroups.length) {
-          availableSecurityGroups = existingSecurityGroupNames;
+          availableSecurityGroups = regionalGroupNames;
         } else {
           availableSecurityGroups = _.intersection(availableSecurityGroups, regionalGroupNames);
         }
@@ -238,7 +273,7 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
       clearInvalidSecurityGroups();
     }
 
-    ctrl.mixinUpsert = function (descriptor) {
+    ctrl.mixinUpsert = function (descriptor: string) {
       $scope.taskMonitor.submit(function () {
         return SecurityGroupWriter.upsertSecurityGroup($scope.securityGroup, application, descriptor);
       });
@@ -247,7 +282,7 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
     function clearInvalidSecurityGroups() {
       const removed = $scope.state.removedRules;
       const securityGroup = $scope.securityGroup;
-      $scope.securityGroup.securityGroupIngress = (securityGroup.securityGroupIngress || []).filter((rule) => {
+      $scope.securityGroup.securityGroupIngress = (securityGroup.securityGroupIngress || []).filter((rule: any) => {
         if (
           rule.accountName &&
           rule.vpcId &&
@@ -287,7 +322,7 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
     $scope.coordinatesChanged = new Subject();
 
     ctrl.initializeSecurityGroups = function () {
-      return securityGroupReader.getAllSecurityGroups().then(function (securityGroups) {
+      return securityGroupReader.getAllSecurityGroups().then(function (securityGroups: any) {
         setSecurityGroupRefreshTime();
         allSecurityGroups = securityGroups;
         const account = $scope.securityGroup.credentials || $scope.securityGroup.accountName;
@@ -304,7 +339,7 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
         $scope.availableSecurityGroups = _.map(availableGroups, 'name');
         const securityGroupExclusions = AWSProviderSettings.securityGroupExclusions;
         $scope.allSecurityGroups = securityGroupExclusions
-          ? filterObjectValues(securityGroups, (name) => !securityGroupExclusions.includes(name))
+          ? filterObjectValues(securityGroups, (name: string) => !securityGroupExclusions.includes(name))
           : securityGroups;
         $scope.allSecurityGroupsUpdated.next();
         $scope.state.regionError =
@@ -332,12 +367,12 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
     };
 
     ctrl.namePattern = {
-      test: function (name) {
+      test: function (name: string) {
         return ctrl.getCurrentNamePattern().test(name);
       },
     };
 
-    ctrl.addRule = function (ruleset) {
+    ctrl.addRule = function (ruleset: any[]) {
       ruleset.push({
         type: 'tcp',
         startPort: 7001,
@@ -345,11 +380,11 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
       });
     };
 
-    ctrl.removeRule = function (ruleset, index) {
+    ctrl.removeRule = function (ruleset: any[], index: number) {
       ruleset.splice(index, 1);
     };
 
-    ctrl.updateRuleType = function (type, ruleset, index) {
+    ctrl.updateRuleType = function (type: string, ruleset: any[], index: number) {
       const rule = ruleset[index];
       if (type === 'icmp' || type === 'icmpv6') {
         rule.startPort = 0;

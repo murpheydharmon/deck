@@ -1,12 +1,19 @@
-'use strict';
-
 import { module } from 'angular';
+import type { IScope } from 'angular';
 
+import type { Application } from '@spinnaker/core';
 import { TaskExecutor, TaskMonitor } from '@spinnaker/core';
 
 export const AMAZON_SERVERGROUP_DETAILS_SCHEDULEDACTION_EDITSCHEDULEDACTIONS_MODAL_CONTROLLER =
   'spinnaker.amazon.serverGroup.details.scheduledActions.editScheduledActions.modal.controller';
 export const name = AMAZON_SERVERGROUP_DETAILS_SCHEDULEDACTION_EDITSCHEDULEDACTIONS_MODAL_CONTROLLER; // for backwards compatibility
+
+interface IEditScheduledActionsScope extends IScope {
+  command: any;
+  serverGroup: any;
+  taskMonitor: TaskMonitor;
+}
+
 module(AMAZON_SERVERGROUP_DETAILS_SCHEDULEDACTION_EDITSCHEDULEDACTIONS_MODAL_CONTROLLER, []).controller(
   'EditScheduledActionsCtrl',
   [
@@ -14,9 +21,9 @@ module(AMAZON_SERVERGROUP_DETAILS_SCHEDULEDACTION_EDITSCHEDULEDACTIONS_MODAL_CON
     '$uibModalInstance',
     'application',
     'serverGroup',
-    function ($scope, $uibModalInstance, application, serverGroup) {
+    function ($scope: IEditScheduledActionsScope, $uibModalInstance: any, application: Application, serverGroup: any) {
       $scope.command = {
-        scheduledActions: serverGroup.scheduledActions.map((action) => {
+        scheduledActions: serverGroup.scheduledActions.map((action: any) => {
           return {
             recurrence: action.recurrence,
             minSize: action.minSize,
@@ -32,7 +39,7 @@ module(AMAZON_SERVERGROUP_DETAILS_SCHEDULEDACTION_EDITSCHEDULEDACTIONS_MODAL_CON
         $scope.command.scheduledActions.push({});
       };
 
-      this.removeScheduledAction = (index) => {
+      this.removeScheduledAction = (index: number) => {
         $scope.command.scheduledActions.splice(index, 1);
       };
 

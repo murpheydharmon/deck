@@ -1,11 +1,24 @@
-'use strict';
-
 import { module } from 'angular';
+import type { IScope } from 'angular';
 
+import type { Application } from '@spinnaker/core';
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
 export const AZURE_PIPELINE_STAGES_ENABLEASG_AZUREENABLEASGSTAGE = 'spinnaker.azure.pipeline.stage.enableAsgStage';
 export const name = AZURE_PIPELINE_STAGES_ENABLEASG_AZUREENABLEASGSTAGE; // for backwards compatibility
+
+interface IAzureEnableAsgScope extends IScope {
+  stage: any;
+  application: Application;
+  accounts: any[];
+  state: {
+    accounts: boolean;
+    regionsLoaded: boolean;
+  };
+  targets: any[];
+  accountUpdated: () => void;
+}
+
 module(AZURE_PIPELINE_STAGES_ENABLEASG_AZUREENABLEASGSTAGE, [])
   .config(function () {
     Registry.pipeline.registerStage({
@@ -20,11 +33,11 @@ module(AZURE_PIPELINE_STAGES_ENABLEASG_AZUREENABLEASGSTAGE, [])
         { type: 'requiredField', fieldName: 'regions' },
         { type: 'requiredField', fieldName: 'credentials', fieldLabel: 'account' },
       ],
-    });
+    } as any);
   })
   .controller('azureEnableAsgStageCtrl', [
     '$scope',
-    function ($scope) {
+    function ($scope: IAzureEnableAsgScope) {
       const ctrl = this;
 
       const stage = $scope.stage;
@@ -34,7 +47,7 @@ module(AZURE_PIPELINE_STAGES_ENABLEASG_AZUREENABLEASGSTAGE, [])
         regionsLoaded: false,
       };
 
-      AccountService.listAccounts('azure').then(function (accounts) {
+      AccountService.listAccounts('azure').then(function (accounts: any[]) {
         $scope.accounts = accounts;
         $scope.state.accounts = true;
       });
@@ -50,7 +63,6 @@ module(AZURE_PIPELINE_STAGES_ENABLEASG_AZUREENABLEASGSTAGE, [])
       stage.cloudProvider = 'azure';
 
       if (stage.isNew) {
-        // bypass the health check for now; will change this later to ['azureService'] and we will also add back the check for $scope.application.attributes.platformHealthOnly
         stage.interestingHealthProviderNames = [];
       }
 

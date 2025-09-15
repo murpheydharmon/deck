@@ -1,11 +1,31 @@
-'use strict';
-
 import { module } from 'angular';
+import type { IScope } from 'angular';
+
+import type { Application } from '@spinnaker/core';
 import { AccountService, Registry, StageConstants } from '@spinnaker/core';
 
 export const AMAZON_PIPELINE_STAGES_MODIFYSCALINGPROCESS_MODIFYSCALINGPROCESSSTAGE =
   'spinnaker.amazon.pipeline.stage.modifyScalingProcessStage';
 export const name = AMAZON_PIPELINE_STAGES_MODIFYSCALINGPROCESS_MODIFYSCALINGPROCESSSTAGE; // for backwards compatibility
+
+interface IModifyScalingProcessScope extends IScope {
+  stage: any;
+  application: Application;
+  accounts: any[];
+  state: {
+    accounts: boolean;
+    regionsLoaded: boolean;
+  };
+  targets: any[];
+  actions: Array<{
+    label: string;
+    val: string;
+  }>;
+  processes: string[];
+  toggleProcess: (process: string) => void;
+  accountUpdated: () => void;
+}
+
 module(AMAZON_PIPELINE_STAGES_MODIFYSCALINGPROCESS_MODIFYSCALINGPROCESSSTAGE, [])
   .config(function () {
     Registry.pipeline.registerStage({
@@ -27,12 +47,12 @@ module(AMAZON_PIPELINE_STAGES_MODIFYSCALINGPROCESS_MODIFYSCALINGPROCESSSTAGE, []
       ],
       cloudProvider: 'aws',
       strategy: true,
-    });
+    } as any);
   })
   .controller('ModifyScalingProcessStageCtrl', [
     '$scope',
     'stage',
-    function ($scope, stage) {
+    function ($scope: IModifyScalingProcessScope, stage: any) {
       $scope.stage = stage;
 
       $scope.state = {
@@ -40,7 +60,7 @@ module(AMAZON_PIPELINE_STAGES_MODIFYSCALINGPROCESS_MODIFYSCALINGPROCESSSTAGE, []
         regionsLoaded: false,
       };
 
-      AccountService.listAccounts('aws').then(function (accounts) {
+      AccountService.listAccounts('aws').then(function (accounts: any[]) {
         $scope.accounts = accounts;
         $scope.state.accounts = true;
       });
@@ -81,7 +101,7 @@ module(AMAZON_PIPELINE_STAGES_MODIFYSCALINGPROCESS_MODIFYSCALINGPROCESSSTAGE, []
         stage.regions.push($scope.application.defaultRegions.aws);
       }
 
-      $scope.toggleProcess = function (process) {
+      $scope.toggleProcess = function (process: string) {
         if (!stage.processes) {
           stage.processes = [];
         }
